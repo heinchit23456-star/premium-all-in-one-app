@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium All-In-One App + Secure Admin</title>
+    <script src="https://sad.adsgram.ai/js/adsgram-telegram-mini-apps.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        
+        /* 🌌 ပုံထဲကအတိုင်း လှပတဲ့ ခရမ်းပြာရောင် (Deep Blue/Purple) Gradient နောက်ခံ */
+        body { 
+            background: radial-gradient(circle at top, #1a1b35 0%, #0d0e1a 100%); 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start; 
+            min-height: 100vh; 
+            padding: 15px; 
+            color: #f5f5f5; 
+        }
+        
+        /* 📱 Premium Glassmorphism Container ဘောင် */
+        .container { 
+            background: rgba(23, 25, 48, 0.85); 
+            border: 1px solid rgba(0, 136, 204, 0.2); 
+            border-radius: 24px; 
+            padding: 22px; 
+            width: 100%; 
+            max-width: 450px; 
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(12px);
+        }
+        
+        /* 🗂️ Tab Bar ကို Neon Blue/Purple စတိုင်လ် ပြောင်းလဲခြင်း */
+        .tab-bar { display: flex; background: #0c0d17; padding: 5px; border-radius: 16px; margin-bottom: 22px; border: 1px solid #1f213a; overflow-x: auto; }
+        .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: #7882a5; font-weight: 600; cursor: pointer; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 70px; }
+        
+        /* Active ဖြစ်တဲ့ Tab ကို ပုံထဲကလို Glow ဖြစ်တဲ့ အပြာနုရောင် ပြောင်းလဲခြင်း */
+        .tab-btn.active { background: #0088cc; color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4); }
+        
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* 📦 ကတ်ပြားများကို ပိုမိုနက်မှောင်သော ခရမ်းပြာရောင် ပြောင်းလဲခြင်း */
+        .admin-box { background: #131529; border: 1px solid rgba(0, 136, 204, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: inset 0 1px 3px rgba(255,255,255,0.02); }
+        .alert-box-dark { background: rgba(0, 136, 204, 0.08); color: #00aaff; padding: 12px; border-radius: 12px; font-size: 0.8rem; text-align: center; margin-bottom: 18px; border: 1px solid rgba(0, 136, 204, 0.2); }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #00aaff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .form-group input { width: 100%; padding: 14px; background: #090a14; border: 1px solid #1f213a; border-radius: 10px; color: white; font-size: 0.95rem; transition: border 0.2s; }
+        .form-group input:focus { outline: none; border-color: #00aaff; box-shadow: 0 0 8px rgba(0, 136, 204, 0.3); }
+        
+        /* ⚡ 🎬 🚀 အပြာနုရောင်/ခရမ်းရောင် Glow Action Button */
+        .btn-gold-action { width: 100%; padding: 16px; background: linear-gradient(135deg, #0088cc 0%, #005580 100%); border: none; border-radius: 14px; font-weight: 800; color: #fff; cursor: pointer; font-size: 1rem; text-transform: uppercase; box-shadow: 0 5px 18px rgba(0, 136, 204, 0.3); transition: all 0.2s; }
+        .btn-gold-action:active { transform: scale(0.97); }
+        
+        /* 🟢 ပုံထဲကအတိုင်း စိမ်းဖန့်ဖန့် ဆွဲဆောင်မှုရှိသော ငွေထုတ်ခလုတ် (Request Withdrawal စတိုင်လ်) */
+        .btn-premium-withdraw { width: 100%; padding: 16px; background: #00b074; color: #ffffff; border: none; border-radius: 14px; font-weight: 800; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 176, 116, 0.3); transition: all 0.2s; }
+        .btn-premium-withdraw:hover { background: #00c782; }
+        .btn-premium-withdraw:active { transform: scale(0.97); }
+        
+        .address-box { background: #090a14; padding: 10px; border-radius: 8px; border: 1px solid #1f213a; font-family: monospace; font-size: 0.8rem; color: #00aaff; margin: 8px 0; word-break: break-all; }
+        .action-group { display: flex; gap: 10px; margin-top: 12px; }
+        .btn-approve { flex: 1; padding: 10px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+        .btn-reject { flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('earn', this)"><span>💎</span><span>Earn</span></button>
+            <button class="tab-btn" onclick="switchTab('spin', this)"><span>🔄</span><span>Tasks</span></button>
+            <button class="tab-btn" onclick="switchTab('wallet', this)"><span>💼</span><span>Wallet</span></button>
+            <button class="tab-btn" id="adminTabButton" onclick="switchTab('admin', this)" style="display: none; border: 1px dashed #00aaff;">🛡️ Admin</button>
+        </div>
+
+        <div class="alert-box-dark">⚠️ Please open inside Telegram Mini App for full functionality.</div>
+
+        <div id="tab-earn" class="tab-content active">
+            <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">Watch & Earn</h2>
+            <div class="admin-box" style="padding: 12px; font-size: 0.85rem;">🆔 User ID: <span id="displayUserId" style="color:#00aaff; font-weight:bold;">anonymous</span></div>
+            <div class="admin-box" style="text-align: center;">
+                <div style="font-size: 0.85rem; color: #7882a5;">💰 TON BALANCE</div>
+                <div style="font-size: 1.7rem; font-weight: bold; color: #00aaff; margin: 4px 0;" id="balance">0.01030</div>
+            </div>
+            <button class="btn-gold-action" onclick="alert('Video Triggered!')">🎬 WATCH EXCLUSIVE VIDEO</button>
+        </div>
+
+        <div id="tab-spin" class="tab-content">
+            <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🔄 Adsgram Tasks</h2>
+            <div class="admin-box" style="text-align: center; padding: 20px;">
+                <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 8px;">ကြော်ငြာကြည့်ရှုမှုတစ်ခုစီအတွက် ရရှိမည့်ဆုကြေး</p>
+                <h3 style="color: #00aaff; font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">+ 0.00033 TON</h3>
+                <button class="btn-gold-action" onclick="triggerAdsgramVideo()">🚀 WATCH ADSGRAM VIDEO</button>
+            </div>
+        </div>
+
+        <div id="tab-wallet" class="tab-content">
+            <div class="admin-box">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <span style="font-size: 0.8rem; color: #7882a5;">WITHDRAWABLE BALANCE</span>
+                    <h2 style="color: #00aaff; font-size: 1.8rem; margin-top: 3px;">0.006168 TON</h2>
+                </div>
+                <div class="form-group">
+                    <label>Withdraw Amount (TON) <span style="color: #ef4444;">(Min: 0.1)</span></label>
+                    <input type="number" id="withdrawAmount" placeholder="0.1" min="0.1" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Your TON Receive Address</label>
+                    <input type="text" id="tonAddress" placeholder="Enter TON Address...">
+                </div>
+                <button class="btn-premium-withdraw" onclick="requestWithdraw()">CONFIRM WITHDRAWAL</button>
+                <p id="withdrawStatus" style="margin-top:12px; font-size:0.85rem; text-align:center; display:none; font-weight: bold;"></p>
+            </div>
+        </div>
+
+        <div id="tab-admin" class="tab-content">
+            <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🛡️ Admin Withdrawal Panel</h2>
+            <div class="admin-box" style="border-color: #00aaff;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;">
+                    <span>User Telegram ID:</span>
+                    <span style="color: #00aaff; font-weight:bold;" id="adminViewUser">689254110</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:0.85rem;">
+                    <span>တောင်းဆိုသည့်ပမာဏ:</span>
+                    <span style="color: #22c55e; font-weight:bold; font-size:1rem;" id="adminViewAmount">0.10 TON</span>
+                </div>
+                <p style="font-size:0.8rem; color:#7882a5;">TON Receive Address:</p>
+                <div class="address-box" id="adminViewAddress">Enter address</div>
+                <div class="action-group">
+                    <button class="btn-approve" onclick="adminAction('approve')">Approve (အတည်ပြု)</button>
+                    <button class="btn-reject" onclick="adminAction('reject')">Reject (ငြင်းပယ်)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== ကိုယ့်ရဲ့ ဆက်တင်များ ====================
+        const ADSGRAM_BLOCK_ID = "YOUR_ADSGRAM_BLOCK_ID"; 
+        const ADMIN_ID = "8842061595"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKQOQWnH-fVW-0qJt9aARUBXAH098lfo6thIDo6dZPTK15g7AQhi0a4ojJHWMsCr4/exec";
+        // =================================================================
+
+        let currentUserId = "anonymous";
+        
+        try {
+            window.Telegram.WebApp.ready();
+            window.Telegram.WebApp.expand();
+            const user = window.Telegram.WebApp.initDataUnsafe?.user;
+            if (user) {
+                currentUserId = user.id.toString();
+            }
+        } catch (e) {}
+
+        document.getElementById('displayUserId').innerText = currentUserId;
+
+        if (currentUserId === ADMIN_ID || currentUserId === "anonymous") { 
+            document.getElementById('adminTabButton').style.display = 'flex';
+        }
+
+        function switchTab(tab, btn) {
+            document.getElementById('tab-earn').style.display = 'none';
+            document.getElementById('tab-spin').style.display = 'none';
+            document.getElementById('tab-wallet').style.display = 'none';
+            document.getElementById('tab-admin').style.display = 'none';
+
+            if(tab === 'earn') document.getElementById('tab-earn').style.display = 'block';
+            if(tab === 'spin') document.getElementById('tab-spin').style.display = 'block';
+            if(tab === 'wallet') document.getElementById('tab-wallet').style.display = 'block';
+            if(tab === 'admin') document.getElementById('tab-admin').style.display = 'block';
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function triggerAdsgramVideo() {
+            if (typeof Adsgram === 'undefined') {
+                alert("Adsgram SDK not loaded.");
+                return;
+            }
+            Adsgram.init({
+                blockId: ADSGRAM_BLOCK_ID
+            }).then(() => {
+                Adsgram.show();
+            }).catch(err => {
+                alert("ကြော်ငြာ မရနိုင်သေးပါ၊ နောက်မှ ထပ်စမ်းကြည့်ပါ");
+            });
+        }
+
+        function requestWithdraw() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const address = document.getElementById('tonAddress').value.trim();
+            const statusText = document.getElementById('withdrawStatus');
+
+            if (!amount || !address) { 
+                alert("အချက်အလက် ဖြည့်စွက်ပါ"); 
+                return; 
+            }
+            
+            if (amount < 0.1) { 
+                alert("အနည်းဆုံးထုတ်ငွေ 0.1 TON လိုအပ်ပါသည်။"); 
+                return; 
+            }
+
+            statusText.style.display = 'block';
+            statusText.style.color = '#00aaff';
+            statusText.innerText = "⏳ Admin ဆီ ပို့နေပါသည်...";
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    userId: currentUserId,
+                    amount: amount,
+                    address: address,
+                    chatId: ADMIN_ID
+                })
+            })
+            .then(() => {
+                statusText.style.color = '#22c55e';
+                statusText.innerText = "✅ တောင်းဆိုချက် ပို့ပြီးပါပြီ။ Admin စစ်ဆေးနေပါသည်။";
+                
+                document.getElementById('adminViewUser').innerText = currentUserId;
+                document.getElementById('adminViewAmount').innerText = amount.toFixed(2) + " TON";
+                document.getElementById('adminViewAddress').innerText = address;
+            })
+            .catch(() => {
+                statusText.style.color = '#ef4444';
+                statusText.innerText = "❌ ချိတ်ဆက်မှု မအောင်မြင်ပါ။ ထပ်စမ်းကြည့်ပါ။";
+            });
+        }
+
+        function adminAction(type) {
+            if(type === 'approve') {
+                alert("ငွေထုတ်ယူမှုကို အတည်ပြုပြီးပါပြီ။");
+            } else {
+                alert("ငွေထုတ်ယူမှုကို ငြင်းပယ်လိုက်ပါသည်။");
+            }
+        }
+    </script>
+</body>
+</html>
