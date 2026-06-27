@@ -4,80 +4,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Premium All-In-One App + Secure Admin</title>
-    
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-        
-        body { 
-            background: radial-gradient(circle at top, #1a1b35 0%, #0d0e1a 100%); 
-            display: flex; 
-            justify-content: center; 
-            align-items: flex-start; 
-            min-height: 100vh; 
-            padding: 15px; 
-            color: #f5f5f5; 
-            margin: 0;
-        }
-        
-        .container { 
-            background: rgba(23, 25, 48, 0.85); 
-            border: 1px solid rgba(0, 136, 204, 0.2); 
-            border-radius: 24px; 
-            padding: 22px; 
-            width: 100%; 
-            max-width: 450px; 
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(12px);
-        }
-        
-        .tab-bar { display: flex; background: #0c0d17; padding: 5px; border-radius: 16px; margin-bottom: 22px; border: 1px solid #1f213a; overflow-x: auto; }
+        body { background: radial-gradient(circle at top, #1a1b35 0%, #0d0e1a 100%); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 15px; color: #f5f5f5; margin: 0; }
+        .container { background: rgba(23, 25, 48, 0.85); border: 1px solid rgba(0, 136, 204, 0.2); border-radius: 24px; padding: 22px; width: 100%; max-width: 450px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5); backdrop-filter: blur(12px); display: flex; flex-direction: column; }
+        .tab-bar { display: flex; background: #0c0d17; padding: 5px; border-radius: 16px; margin-top: 22px; border: 1px solid #1f213a; overflow-x: auto; }
         .tab-btn { flex: 1; padding: 12px 5px; background: transparent; border: none; color: #7882a5; font-weight: 600; cursor: pointer; font-size: 0.9rem; border-radius: 12px; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 70px; }
         .tab-btn.active { background: #0088cc; color: #ffffff; font-weight: 700; box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4); }
-        
-        .tab-content { display: none; }
+        .tab-content { display: none; flex-grow: 1; }
         .tab-content.active { display: block; }
-        
         .admin-box { background: #131529; border: 1px solid rgba(0, 136, 204, 0.1); border-radius: 16px; padding: 18px; margin-bottom: 16px; box-shadow: inset 0 1px 3px rgba(255,255,255,0.02); }
         .alert-box-dark { background: rgba(0, 136, 204, 0.08); color: #00aaff; padding: 12px; border-radius: 12px; font-size: 0.8rem; text-align: center; margin-bottom: 18px; border: 1px solid rgba(0, 136, 204, 0.2); }
-        
         .form-group { margin-bottom: 16px; }
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #00aaff; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
         .form-group input { width: 100%; padding: 14px; background: #090a14; border: 1px solid #1f213a; border-radius: 10px; color: white; font-size: 0.95rem; transition: border 0.2s; }
         .form-group input:focus { outline: none; border-color: #00aaff; box-shadow: 0 0 8px rgba(0, 136, 204, 0.3); }
-        
         .btn-gold-action { width: 100%; padding: 16px; background: linear-gradient(135deg, #0088cc 0%, #005580 100%); border: none; border-radius: 14px; font-weight: 800; color: #fff; cursor: pointer; font-size: 1rem; text-transform: uppercase; box-shadow: 0 5px 18px rgba(0, 136, 204, 0.3); transition: all 0.2s; margin-bottom: 10px; }
         .btn-gold-action:active { transform: scale(0.97); }
         .btn-gold-action:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
-        
         .btn-premium-withdraw { width: 100%; padding: 16px; background: #00b074; color: #ffffff; border: none; border-radius: 14px; font-weight: 800; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 4px 15px rgba(0, 176, 116, 0.3); transition: all 0.2s; }
         .btn-premium-withdraw:hover { background: #00c782; }
         .btn-premium-withdraw:active { transform: scale(0.97); }
         .btn-premium-withdraw:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
-        
         .address-box { background: #090a14; padding: 10px; border-radius: 8px; border: 1px solid #1f213a; font-family: monospace; font-size: 0.8rem; color: #00aaff; margin: 8px 0; word-break: break-all; }
         .action-group { display: flex; gap: 10px; margin-top: 12px; }
         .btn-approve { flex: 1; padding: 10px; background: #22c55e; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
         .btn-reject { flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        
         .status-message { margin-top: 12px; font-size: 0.85rem; text-align: center; display: none; font-weight: bold; padding: 8px; border-radius: 8px; }
+        .referral-console { background: #131529; border: 1px solid #1f213a; border-radius: 16px; padding: 15px; margin-bottom: 16px; }
+        .referral-console h3 { font-size: 1rem; color: #00aaff; margin-bottom: 5px; }
+        .referral-link { width: 100%; padding: 10px; background: #090a14; border: 1px solid #1f213a; border-radius: 8px; color: #fff; font-size: 0.85rem; margin-bottom: 8px; }
+        .btn-copy { width: 100%; padding: 10px; background: #0088cc; color: white; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.85rem; }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <div class="tab-bar">
-            <button class="tab-btn active" data-tab="earn"><span>💎</span><span>Earn</span></button>
-            <button class="tab-btn" data-tab="tasks"><span>🔄</span><span>Tasks</span></button>
-            <button class="tab-btn" data-tab="wallet"><span>💼</span><span>Wallet</span></button>
-            <button class="tab-btn" id="adminTabButton" data-tab="admin" style="display: none; border: 1px dashed #00aaff;">🛡️ Admin</button>
-        </div>
+        <div class="alert-box-dark">🙋🏻‍♂️Yoka 🎁Grid 📺Zenith_bot🤑</div>
 
-        <div class="alert-box-dark">⚠️ Please open inside Telegram Mini App for full functionality.</div>
-
-        <!-- Earn Tab -->
         <div id="tab-earn" class="tab-content active">
             <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">Watch & Earn</h2>
             <div class="admin-box" style="padding: 12px; font-size: 0.85rem;">🆔 User ID: <span id="displayUserId" style="color:#00aaff; font-weight:bold;">Loading...</span></div>
@@ -85,24 +49,31 @@
                 <div style="font-size: 0.85rem; color: #7882a5;">💰 USDT BALANCE</div>
                 <div style="font-size: 1.7rem; font-weight: bold; color: #00aaff; margin: 4px 0;" id="balance">0.0000</div>
             </div>
-            <div style="font-size:0.8rem; color:#aaa; text-align:center; margin-bottom:6px;">📊 ယနေ့ကြော်ငြာကြည့်ရှုမှု: <span id="dailyCount">0</span>/500</div>
+            <div style="font-size:0.8rem; color:#aaa; text-align:center; margin-bottom:6px;">📊 : <span id="dailyCountEarn">0</span>/500</div>
             <button class="btn-gold-action" id="adsterraBtn" onclick="openAdsterraLink()">🎬 WATCH EXCLUSIVE VIDEO</button>
             <p id="adsterraStatus" class="status-message"></p>
+
+            <div class="referral-console" style="margin-top: 15px;">
+                <h3>👥 Referral Program</h3>
+                <p style="font-size:0.8rem; margin-bottom:0.6rem;">💎 One-time: $0.01 · Lifetime share: 5%</p>
+                <label style="font-size:0.7rem; color:#9aa4bf;">YOUR REFERRAL LINK</label>
+                <input type="text" id="refLink" readonly class="referral-link" onclick="this.select();">
+                <button class="btn-copy" id="copyRefBtn">📋 COPY LINK</button>
+                <p style="font-size:0.95rem; color:#7f8aa0; margin-top:0.5rem;">🎁You will receive benefits by inviting.</p>
+            </div>
         </div>
 
-        <!-- Tasks Tab -->
         <div id="tab-tasks" class="tab-content">
             <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🔄 Adsgram Tasks</h2>
             <div class="admin-box" style="text-align: center; padding: 20px;">
                 <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 8px;">ကြော်ငြာကြည့်ရှုမှုတစ်ခုစီအတွက် ရရှိမည့်ဆုကြေး</p>
                 <h3 style="color: #00aaff; font-size: 1.5rem; font-weight: bold; margin-bottom: 20px;">+ 0.0045 USDT</h3>
-                <div style="font-size:0.8rem; color:#aaa; margin-bottom:6px;">📊 ယနေ့ကြော်ငြာကြည့်ရှုမှု: <span id="dailyCount2">0</span>/500</div>
+                <div style="font-size:0.8rem; color:#aaa; margin-bottom:6px;">📊 ယနေ့ Adsgram ကြည့်ရှုမှု: <span id="dailyCountTasks">0</span>/500</div>
                 <button class="btn-gold-action" id="adsgramBtn" onclick="triggerAdsgramVideo()">🚀 WATCH ADSGRAM VIDEO</button>
                 <p id="adsgramStatus" class="status-message"></p>
             </div>
-        </div>
+         </div>
 
-        <!-- Wallet Tab -->
         <div id="tab-wallet" class="tab-content">
             <div class="admin-box">
                 <div style="text-align: center; margin-bottom: 20px;">
@@ -122,7 +93,6 @@
             </div>
         </div>
 
-        <!-- Admin Tab -->
         <div id="tab-admin" class="tab-content">
             <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🛡️ Admin Withdrawal Panel</h2>
             <div class="admin-box" style="border-color: #00aaff;">
@@ -143,316 +113,411 @@
                 <p id="adminStatus" class="status-message"></p>
             </div>
         </div>
+
+        <div class="tab-bar">
+            <button class="tab-btn active" data-tab="earn"><span>💎</span><span>Earn</span></button>
+            <button class="tab-btn" data-tab="tasks"><span>🔄</span><span>Tasks</span></button>
+            <button class="tab-btn" data-tab="wallet"><span>💼</span><span>Wallet</span></button>
+            <button class="tab-btn" id="adminTabButton" data-tab="admin" style="display: none; border: 1px dashed #00aaff;">🛡️ Admin</button>
+        </div>
     </div>
 
-    <!-- Adsgram SDK ကို တစ်ကြိမ်တည်းသာ ခေါ်ယူပါ -->
     <script src="https://sad.adsgram.ai/js/adsgram-telegram-mini-apps.js" 
             onerror="this.onerror=null; this.src='https://telegram.adsgram.ai/js/adsgram-telegram-mini-apps.js';">
     </script>
 
     <script>
-        // ==================== ⚙️ CONFIGURATION ====================
-        const ADSGRAM_BLOCK_ID = "36348"; // သင့် Block ID ဖြင့် အစားထိုးပါ
-        const ADSTERRA_DIRECT_LINK = "https://potterynaggingformerly.com/r95xxkue6r?key=cde20067d822c42373a4ea5deb13d66a"; 
-        const ADMIN_ID = "8842061595"; 
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKQOQWnH-fVW-0qJt9aARUBXAH098lfo6thIDo6dZPTK15g7AQhi0a4ojJHWMsCr4/exec";
-        const REWARD_PER_AD = 0.0045; 
-        const MAX_DAILY_ADS = 500; 
-        // =========================================================
+    // ==================== ⚙️ CONFIGURATION ====================
+    const ADSGRAM_BLOCK_ID = "task-36348";
+    const ADSTERRA_DIRECT_LINK = "https://potterynaggingformerly.com/r95xxkue6r?key=cde20067d822c42373a4ea5deb13d66a";
+    const ADMIN_ID = "8842061595";
+    const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKQOQWnH-fVW-0qJt9aARUBXAH098lfo6thIDo6dZPTK15g7AQhi0a4ojJHWMsCr4/exec";
+    const REWARD_PER_AD = 0.0045;
+    const MAX_DAILY_ADS = 500;
 
-        let currentUserId = "anonymous";
-        let AdsgramSDK = null; // Adsgram SDK instance သိမ်းရန်
+    let currentUserId = "anonymous";
+    let AdsgramSDK = null;
+    let userBalance = 0;
+    let adsgramRetryCount = 0;
+    const MAX_ADSGRAM_RETRY = 8;
 
-        // ----- localStorage Keys -----
-        const STORAGE_KEYS = {
-            BALANCE: 'app_usdt_balance',
-            AD_COUNT: 'app_ad_count',
-            AD_DATE: 'app_ad_count_date'
-        };
+    function getStorageKey(baseKey) {
+        return baseKey + "_" + currentUserId;
+    }
 
-        // ----- Balance Management -----
-        let userBalance = parseFloat(localStorage.getItem(STORAGE_KEYS.BALANCE)) || 0;
-        
-        function updateBalanceDisplay() {
-            document.getElementById('balance').innerText = userBalance.toFixed(4);
-            document.getElementById('walletBalance').innerText = userBalance.toFixed(4);
+    function updateBalanceDisplay() {
+        const balEl = document.getElementById('balance');
+        const wbalEl = document.getElementById('walletBalance');
+        if (balEl) balEl.innerText = userBalance.toFixed(4);
+        if (wbalEl) wbalEl.innerText = userBalance.toFixed(4);
+    }
+
+    function addBalance(amount) {
+        userBalance = Math.max(0, userBalance + Number(amount));
+        localStorage.setItem(getStorageKey('app_usdt_balance'), userBalance.toString());
+        updateBalanceDisplay();
+    }
+
+    function addBalance(amount) {
+    userBalance = Math.max(0, (userBalance || 0) + Number(amount));
+    localStorage.setItem(getStorageKey('app_usdt_balance'), userBalance.toString());
+    updateBalanceDisplay();
+}
+
+    function getTodayDateString() {
+        const now = new Date();
+        const mm = String(now.getMonth()+1).padStart(2,'0');
+        const dd = String(now.getDate()).padStart(2,'0');
+        return now.getFullYear() + '-' + mm + '-' + dd;
+    }
+
+    function resetDailyCountIfNeeded() {
+        const today = getTodayDateString();
+        const storedDate = localStorage.getItem(getStorageKey('app_ad_count_date'));
+        if (storedDate !== today) {
+            localStorage.setItem(getStorageKey('app_ad_count_date'), today);
+            localStorage.setItem(getStorageKey('app_earn_ad_count'), '0');
+            localStorage.setItem(getStorageKey('app_tasks_ad_count'), '0');
         }
-        
-        function addBalance(amount) {
-            userBalance += amount;
-            localStorage.setItem(STORAGE_KEYS.BALANCE, userBalance.toString());
-            updateBalanceDisplay();
-        }
+    }
 
-        function deductBalance(amount) {
-            userBalance = Math.max(0, userBalance - amount);
-            localStorage.setItem(STORAGE_KEYS.BALANCE, userBalance.toString());
-            updateBalanceDisplay();
+    function getDailyAdCount(type) {
+        resetDailyCountIfNeeded();
+        if(type === 'earn') {
+            return parseInt(localStorage.getItem(getStorageKey('app_earn_ad_count')) || '0', 10);
+        } else {
+            return parseInt(localStorage.getItem(getStorageKey('app_tasks_ad_count')) || '0', 10);
         }
+    }
 
-        // ----- Daily Ad Counter Management -----
-        function getTodayDateString() {
-            const now = new Date();
-            return now.getFullYear() + '-' + (now.getMonth()+1) + '-' + now.getDate();
+    function incrementAdCount(type) {
+        let count = getDailyAdCount(type);
+        count++;
+        if(type === 'earn') {
+            localStorage.setItem(getStorageKey('app_earn_ad_count'), count.toString());
+        } else {
+            localStorage.setItem(getStorageKey('app_tasks_ad_count'), count.toString());
         }
+        updateDailyCountDisplay();
+    }
 
-        function resetDailyCountIfNeeded() {
-            const today = getTodayDateString();
-            const storedDate = localStorage.getItem(STORAGE_KEYS.AD_DATE);
-            if (storedDate !== today) {
-                localStorage.setItem(STORAGE_KEYS.AD_DATE, today);
-                localStorage.setItem(STORAGE_KEYS.AD_COUNT, '0');
-            }
-        }
+    function updateDailyCountDisplay() {
+        const earnCount = getDailyAdCount('earn');
+        const tasksCount = getDailyAdCount('tasks');
+        const dispEarn = document.getElementById('dailyCountEarn');
+        const dispTasks = document.getElementById('dailyCountTasks');
+        if (dispEarn) dispEarn.innerText = earnCount;
+        if (dispTasks) dispTasks.innerText = tasksCount;
+    }
 
-        function getDailyAdCount() {
-            resetDailyCountIfNeeded();
-            return parseInt(localStorage.getItem(STORAGE_KEYS.AD_COUNT) || '0', 10);
-        }
+    function canWatchAd(type) {
+        return getDailyAdCount(type) < MAX_DAILY_ADS;
+    }
 
-        function incrementAdCount() {
-            let count = getDailyAdCount();
-            count++;
-            localStorage.setItem(STORAGE_KEYS.AD_COUNT, count.toString());
-            updateDailyCountDisplay();
-        }
+    function showStatus(elementId, message, isError = false, timeout = 5000) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        el.style.display = 'block';
+        el.style.color = isError ? '#ef4444' : '#22c55e';
+        el.style.background = isError ? 'rgba(239, 68, 68, 0.08)' : 'rgba(34, 197, 94, 0.06)';
+        el.innerText = message;
+        setTimeout(() => { el.style.display = 'none'; }, timeout);
+    }
 
-        function updateDailyCountDisplay() {
-            const count = getDailyAdCount();
-            const disp1 = document.getElementById('dailyCount');
-            const disp2 = document.getElementById('dailyCount2');
-            if (disp1) disp1.innerText = count;
-            if (disp2) disp2.innerText = count;
-        }
+    function fetchWithTimeout(resource, options = {}, timeout = 10000) {
+        return new Promise((resolve, reject) => {
+            const timer = setTimeout(() => reject(new Error('Request timeout')), timeout);
+            fetch(resource, options).then((response) => {
+                clearTimeout(timer);
+                resolve(response);
+            }).catch((err) => {
+                clearTimeout(timer);
+                reject(err);
+            });
+        });
+    }
 
-        function canWatchAd() {
-            return getDailyAdCount() < MAX_DAILY_ADS;
-        }
-
-        // ----- UI Helper -----
-        function showStatus(elementId, message, isError = false) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            el.style.display = 'block';
-            el.style.color = isError ? '#ef4444' : '#22c55e';
-            el.style.background = isError ? 'rgba(239, 68, 68, 0.1)' : 'rgba(34, 197, 94, 0.1)';
-            el.innerText = message;
-            // 5 စက္ကန့်ကြာရင် အလိုအလျောက် ပျောက်သွားမယ်
-            setTimeout(() => { el.style.display = 'none'; }, 5000);
-        }
-
-        // ----- Initialization -----
-        function initApp() {
-            try {
-                window.Telegram.WebApp.ready();
-                window.Telegram.WebApp.expand();
+    function initApp() {
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                if (typeof window.Telegram.WebApp.ready === 'function') window.Telegram.WebApp.ready();
+                if (typeof window.Telegram.WebApp.expand === 'function') window.Telegram.WebApp.expand();
                 const user = window.Telegram.WebApp.initDataUnsafe?.user;
-                if (user) {
-                    currentUserId = user.id.toString();
-                }
-            } catch (e) {
-                console.log("Not running inside Telegram or WebApp init failed");
+                if (user && user.id) currentUserId = String(user.id);
             }
-
-            document.getElementById('displayUserId').innerText = currentUserId;
-
-            // Admin Tab ကို Admin ID နဲ့ ကိုက်ညီမှသာ ပြမယ်
-            if (currentUserId === ADMIN_ID || currentUserId === "anonymous") { 
-                document.getElementById('adminTabButton').style.display = 'flex';
-            }
-
-            updateBalanceDisplay();
-            resetDailyCountIfNeeded();
-            updateDailyCountDisplay();
-
-            // Tab ပြောင်းတဲ့စနစ် သတ်မှတ်
-            setupTabNavigation();
-
-            // Adsgram SDK စစ်ဆေး
-            checkAdsgramSDK();
+        } catch (e) {
+            console.log("Telegram WebApp init skipped or failed:", e);
         }
 
-        function setupTabNavigation() {
-            const tabButtons = document.querySelectorAll('.tab-btn');
-            const tabContents = document.querySelectorAll('.tab-content');
+        const disp = document.getElementById('displayUserId');
+        if (disp) disp.innerText = currentUserId;
 
-            tabButtons.forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const targetTab = this.getAttribute('data-tab');
-                    
-                    // အားလုံး active class ဖြုတ်
-                    tabButtons.forEach(b => b.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    
-                    // လက်ရှိကို active လုပ်
-                    this.classList.add('active');
-                    const targetContent = document.getElementById('tab-' + targetTab);
-                    if (targetContent) {
-                        targetContent.classList.add('active');
+        if (currentUserId === ADMIN_ID) {
+            const adminBtn = document.getElementById('adminTabButton');
+            if (adminBtn) adminBtn.style.display = 'flex';
+        }
+
+        const stored = localStorage.getItem(getStorageKey('app_usdt_balance'));
+        userBalance = stored ? parseFloat(stored) : 0;
+
+        const refLinkInput = document.getElementById('refLink');
+        if (refLinkInput) {
+            refLinkInput.value = "https://t.me/YourBotName?start=" + encodeURIComponent(currentUserId);
+        }
+        const copyBtn = document.getElementById('copyRefBtn');
+        if (copyBtn && refLinkInput) {
+            copyBtn.addEventListener('click', async function() {
+                try {
+                    if (navigator.clipboard && navigator.clipboard.writeText) {
+                        await navigator.clipboard.writeText(refLinkInput.value);
+                    } else {
+                        refLinkInput.select();
+                        document.execCommand('copy');
                     }
-                });
+                    alert('Referral link copied!');
+                } catch (err) {
+                    alert('Copy failed — please copy manually.');
+                }
             });
         }
 
-        function checkAdsgramSDK() {
-            // SDK က global Adsgram variable ကို ထည့်ပေးမယ်လို့ ယူဆထားတယ်
-            if (typeof Adsgram !== 'undefined' && Adsgram.init) {
-                try {
-                    AdsgramSDK = Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-                    console.log("Adsgram SDK initialized successfully");
-                } catch (e) {
-                    console.error("Adsgram init failed:", e);
+        updateBalanceDisplay();
+        resetDailyCountIfNeeded();
+        updateDailyCountDisplay();
+        setupTabNavigation();
+        checkAdsgramSDK();
+    }
+
+    function setupTabNavigation() {
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetTab = this.getAttribute('data-tab');
+                tabButtons.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const targetContent = document.getElementById('tab-' + targetTab);
+                if (targetContent) {
+                    targetContent.classList.add('active');
                 }
+            });
+        });
+    }
+
+    function checkAdsgramSDK() {
+        if (typeof Adsgram !== 'undefined' && Adsgram && typeof Adsgram.init === 'function') {
+            try {
+                AdsgramSDK = Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+                console.log('Adsgram SDK initialized');
+            } catch (e) {
+                console.error("Adsgram init failed:", e);
+            }
+        } else {
+            adsgramRetryCount++;
+            if (adsgramRetryCount <= MAX_ADSGRAM_RETRY) {
+                setTimeout(checkAdsgramSDK, 2000 * adsgramRetryCount);
             } else {
-                console.warn("Adsgram SDK not loaded yet. Retrying in 2 seconds...");
-                setTimeout(checkAdsgramSDK, 2000);
+                console.warn('Adsgram SDK not available after retries');
             }
         }
+    }
 
-        // ========== Adsterra Link (5 စက္ကန့် စောင့်ဆိုင်းခြင်းစနစ်) ==========
-        function openAdsterraLink() {
-            if (!canWatchAd()) {
-                showStatus('adsterraStatus', "❌ ယနေ့အတွက် ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
-                return;
-            }
-
-            const btn = document.getElementById('adsterraBtn');
+    function openAdsterraLink() {
+        if (!canWatchAd('earn')) {
+            showStatus('adsterraStatus', "❌ ယနေ့အတွက် Adsterra ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
+            return;
+        }
+        const btn = document.getElementById('adsterraBtn');
+        if (btn) {
             btn.disabled = true;
             btn.innerText = "⏳ Link ဖွင့်နေသည်... (၅ စက္ကန့် စောင့်ပါ)";
+        }
 
-            try {
+        try {
+            if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
                 window.Telegram.WebApp.openLink(ADSTERRA_DIRECT_LINK);
-            } catch(e) {
-                window.open(ADSTERRA_DIRECT_LINK, '_blank');
+            } else {
+                window.open(ADSTERRA_DIRECT_LINK, '_blank', 'noopener');
             }
+        } catch (e) {
+            window.open(ADSTERRA_DIRECT_LINK, '_blank', 'noopener');
+        }
 
-            setTimeout(() => {
-                incrementAdCount();
-                addBalance(REWARD_PER_AD);
+        setTimeout(() => {
+            incrementAdCount('earn');
+            addBalance(REWARD_PER_AD);
+            if (btn) {
                 btn.disabled = false;
                 btn.innerText = "🎬 WATCH EXCLUSIVE VIDEO";
-                showStatus('adsterraStatus', `✅ အောင်မြင်ပါသည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
-            }, 5000);
+            }
+            showStatus('adsterraStatus', `✅ အောင်မြင်ပါသည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
+        }, 5000);
+    }
+
+    function triggerAdsgramVideo() {
+        if (!canWatchAd('tasks')) {
+            showStatus('adsgramStatus', "❌ ယနေ့အတွက် Adsgram ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
+            return;
         }
 
-        // ========== Adsgram Video (5 စက္ကန့် စောင့်ဆိုင်းခြင်းစနစ်) ==========
-        function triggerAdsgramVideo() {
-            if (!canWatchAd()) {
-                showStatus('adsgramStatus', "❌ ယနေ့အတွက် ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
-                return;
-            }
-            
-            if (!AdsgramSDK) {
-                showStatus('adsgramStatus', "⏳ Adsgram SDK ပြင်ဆင်နေပါသည်။ ခဏစောင့်ပါ...", true);
-                checkAdsgramSDK(); // Retry
-                return;
-            }
+        if (!AdsgramSDK) {
+            showStatus('adsgramStatus', "⏳ Adsgram SDK ပြင်ဆင်နေပါသည်။ ခဏစောင့်ပါ...", true);
+            checkAdsgramSDK();
+            return;
+        }
 
-            const btn = document.getElementById('adsgramBtn');
+        const btn = document.getElementById('adsgramBtn');
+        if (btn) {
             btn.disabled = true;
             btn.innerText = "⏳ ကြော်ငြာ ခေါ်ယူနေသည်...";
+        }
 
-            AdsgramSDK.show().then((result) => {
-                if (result && result.done) {
-                    btn.innerText = "⏳ ၅ စက္ကန့် စောင့်ပါ...";
-                    setTimeout(() => {
-                        incrementAdCount(); 
-                        addBalance(REWARD_PER_AD);
+        AdsgramSDK.show().then((result) => {
+            if (result && result.done) {
+                if (btn) btn.innerText = "⏳ ၅ စက္ကန့် စောင့်ပါ...";
+                setTimeout(() => {
+                    incrementAdCount('tasks');
+                    addBalance(REWARD_PER_AD);
+                    if (btn) {
                         btn.disabled = false;
                         btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-                        showStatus('adsgramStatus', `✅ ကြော်ငြာကြည့်ရှုမှု အောင်မြင်သည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
-                    }, 5000);
-                } else {
+                    }
+                    showStatus('adsgramStatus', `✅ ကြော်ငြာကြည့်ရှုမှု အောင်မြင်သည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
+                }, 5000);
+            } else {
+                if (btn) {
                     btn.disabled = false;
                     btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-                    showStatus('adsgramStatus', "⚠️ ကြော်ငြာကို အဆုံးထိ မကြည့်ခဲ့ပါ။ ထပ်စမ်းကြည့်ပါ။", true);
                 }
-            }).catch((err) => {
-                console.error("Adsgram error:", err);
+                showStatus('adsgramStatus', "⚠️ ကြော်ငြာကို အဆုံးထိ မကြည့်ခဲ့ပါ။ ထပ်စမ်းကြည့်ပါ။", true);
+            }
+        }).catch((err) => {
+            if (btn) {
                 btn.disabled = false;
                 btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-                showStatus('adsgramStatus', "❌ ကြော်ငြာပြသနေစဉ် အမှားရှိနေပါသည်။ သို့မဟုတ် ကြော်ငြာမရှိသေးပါ။", true);
-            });
+            }
+            showStatus('adsgramStatus', "❌ ကြော်ငြာပြသနေစဉ် အမှားရှိနေပါသည်။ သို့မဟုတ် ကြော်ငြာမရှိသေးပါ။", true);
+        });
+    }
+
+    // ✅ ဒီကုဒ်အသစ်ကို အစားထိုးထည့်ပါ
+function isValidTonAddress(addr) {
+    if (!addr) return false;
+    addr = addr.trim();
+    const workchainHex = /^(-1|0):[0-9A-Fa-f]{64}$/;
+    if (workchainHex.test(addr)) return true;
+    const hexOnly = /^(0x)?[0-9A-Fa-f]{64}$/;
+    if (hexOnly.test(addr)) return true;
+    const b64UrlSafe = /^[A-Za-z0-9_\-]{48,52}$/;
+    if (b64UrlSafe.test(addr)) return true;
+    return false;
+}
+
+
+    async function requestWithdraw() {
+        const amountInput = document.getElementById('withdrawAmount');
+        const addressInput = document.getElementById('tonAddress');
+        const btn = document.getElementById('withdrawBtn');
+        const withdrawStatusId = 'withdrawStatus';
+
+        if (!amountInput || !addressInput) {
+            showStatus(withdrawStatusId, "❌ အချက်အလက် ဖြည့်ရန် မရနိုင်ပါ။", true);
+            return;
         }
 
-        // ========== Withdraw System ==========
-        function requestWithdraw() {
-            const amountInput = document.getElementById('withdrawAmount');
-            const addressInput = document.getElementById('tonAddress');
-            const btn = document.getElementById('withdrawBtn');
-            const statusText = document.getElementById('withdrawStatus');
+        const amount = parseFloat(amountInput.value);
+        const address = addressInput.value.trim();
 
-            const amount = parseFloat(amountInput.value);
-            const address = addressInput.value.trim();
+        if (isNaN(amount) || amount <= 0) {
+            showStatus(withdrawStatusId, "❌ မှန်ကန်သော ငွေပမာဏကို ထည့်ပါ။", true);
+            return;
+        }
+        if (amount < 0.1) {
+            showStatus(withdrawStatusId, "❌ အနည်းဆုံးထုတ်ငွေ 0.1 USDT လိုအပ်ပါသည်။", true);
+            return;
+        }
 
-            statusText.style.display = 'none';
+        if (!address || !isValidTonAddress(address)) {
+            showStatus(withdrawStatusId, "❌ မှန်ကန်သော TON လိပ်စာထည့်ပါ။", true);
+            return;
+        }
 
-            if (!amount || !address) { 
-                showStatus('withdrawStatus', "❌ အချက်အလက် ပြည့်စုံစွာ ဖြည့်စွက်ပါ။", true);
-                return; 
-            }
-            
-            if (amount < 0.1) { 
-                showStatus('withdrawStatus', "❌ အနည်းဆုံးထုတ်ငွေ 0.1 USDT လိုအပ်ပါသည်။", true);
-                return; 
-            }
-            
-            if (amount > userBalance) {
-                showStatus('withdrawStatus', "❌ လက်ကျန်မလုံလောက်ပါ။", true);
-                return;
-            }
+        if (amount > userBalance) {
+            showStatus(withdrawStatusId, "❌ လက်ကျန်မလုံလောက်ပါ။", true);
+            return;
+        }
 
+        if (btn) {
             btn.disabled = true;
             btn.innerText = "⏳ ပို့နေပါသည်...";
-            showStatus('withdrawStatus', "⏳ Admin ဆီ ပို့နေပါသည်...");
+        }
 
-            fetch(GOOGLE_SCRIPT_URL, {
+        const payload = {
+            userId: currentUserId,
+            amount: Number(amount),
+            address: address,
+            chatId: ADMIN_ID
+        };
+
+        try {
+            const resp = await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // Google Scripts အတွက် no-cors mode သုံးခြင်းဖြင့် CORS error ရှောင်ပါ
+                mode: 'cors',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    userId: currentUserId,
-                    amount: amount,
-                    address: address,
-                    chatId: ADMIN_ID
-                })
-            })
-            .then(() => {
-                // no-cors mode မှာ response ကို ဖတ်လို့မရပါ။ ဒါပေမယ့် error မတက်ရင် အောင်မြင်တယ်လို့ ယူဆပါ။
-                deductBalance(amount);
+                body: JSON.stringify(payload)
+            }, 15000);
 
-                showStatus('withdrawStatus', "✅ တောင်းဆိုချက် ပို့ပြီးပါပြီ။ Admin အတည်ပြုချက် စောင့်ပါ။");
-                
-                // Admin Panel မှာ နောက်ဆုံးတောင်းဆိုချက်ကို ပြပါ
-                document.getElementById('adminViewUser').innerText = currentUserId;
-                document.getElementById('adminViewAmount').innerText = amount.toFixed(4) + " USDT";
-                document.getElementById('adminViewAddress').innerText = address;
-                
+            if (!resp.ok) {
+                throw new Error('Server returned ' + resp.status);
+            }
+
+            let data;
+            try {
+                data = await resp.json();
+            } catch (e) {
+                throw new Error('Invalid JSON response from server');
+            }
+
+            if (data && data.success) {
+                deductBalance(amount);
+                showStatus(withdrawStatusId, "✅ တောင်းဆိုချက် ပို့ပြီးပါပြီ။ Admin အတည်ပြုချက် စောင့်ပါ။");
+
+                const adminUserEl = document.getElementById('adminViewUser');
+                const adminAmountEl = document.getElementById('adminViewAmount');
+                const adminAddrEl = document.getElementById('adminViewAddress');
+                if (adminUserEl) adminUserEl.innerText = currentUserId;
+                if (adminAmountEl) adminAmountEl.innerText = amount.toFixed(4) + " USDT";
+                if (adminAddrEl) adminAddrEl.innerText = address;
+
                 amountInput.value = '';
                 addressInput.value = '';
-            })
-            .catch((error) => {
-                console.error("Withdraw request failed:", error);
-                showStatus('withdrawStatus', "❌ ချိတ်ဆက်မှု မအောင်မြင်ပါ။ အင်တာနက် စစ်ဆေးပါ။", true);
-            })
-            .finally(() => {
+            } else {
+                throw new Error(data && data.message ? data.message : 'Server rejected withdrawal');
+            }
+        } catch (error) {
+            console.error('Withdraw error:', error);
+            showStatus(withdrawStatusId, "❌ တောင်းဆိုမှု မအောင်မြင်ပါ။ အင်တာနက် သို့မဟုတ် server ပြဿနာ ဖြစ်နိုင်သည်။", true);
+        } finally {
+            if (btn) {
                 btn.disabled = false;
                 btn.innerText = "CONFIRM WITHDRAWAL";
-            });
-        }
-
-        function adminAction(type) {
-            if(type === 'approve') {
-                showStatus('adminStatus', "✅ ငွေထုတ်ယူမှုကို အတည်ပြုပြီးပါပြီ။ (လက်တွေ့တွင် ဒေတာဘေ့စ် အပ်ဒိတ်လုပ်ရန် လိုအပ်ပါသည်)");
-            } else {
-                showStatus('adminStatus', "❌ ငွေထုတ်ယူမှုကို ငြင်းပယ်လိုက်ပါသည်။");
             }
         }
+    }
 
-        // App စတင်
-        initApp();
+    function adminAction(type) {
+        if (type === 'approve') {
+            showStatus('adminStatus', "✅ Ngwe htoat myu ko atad pyu pe par be.");
+        } else {
+            showStatus('adminStatus', "❌ Ngwe htoat myu ko ngyin pal lite par tal.");
+        }
+    }
+
+    initApp();
     </script>
 </body>
 </html>
