@@ -5,9 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Premium All-In-One App + Secure Admin</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- ✅ Adsgram SDK ကို head တွင် စောစီးစွာ စတင် load လုပ်ပြီး ပြဿနာဖြေရှင်းထားသည် -->
-  <script src="https://sad.adsgram.ai/js/adsgram-telegram-mini-apps.js" defer
-          onerror="this.onerror=null; this.src='https://telegram.adsgram.ai/js/adsgram-telegram-mini-apps.js';"></script>
+  <!-- ✅ Adsgram SDK Script လင့်ခ်အမှန်သို့ ပြင်ဆင်ထားပါသည် -->
+  <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
     * {
       box-sizing: border-box;
@@ -282,7 +281,7 @@
   <div class="container">
     <div class="alert-box-dark">🙋🏻‍♂️Yoka 🎁Grid 📺Zenith_bot🤑</div>
 
-    <!-- 🔄 Tasks Tab - ကြော်ငြာကြည့်ရှုခြင်း အားလုံး -->
+    <!-- 🔄 Tasks Tab -->
     <div id="tab-tasks" class="tab-content active">
       <h2 style="font-size: 1.2rem; margin-bottom: 8px; color: #00aaff;">📺 Watch & Earn</h2>
       <div class="admin-box" style="padding: 12px; font-size: 0.85rem;">
@@ -317,7 +316,7 @@
       </div>
     </div>
 
-    <!-- 💎 Refs Tab (မိတ်ဆက်ကုဒ်) -->
+    <!-- 💎 Refs Tab -->
     <div id="tab-refs" class="tab-content">
       <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">👥 Referral Program</h2>
       <div class="referral-console">
@@ -397,30 +396,16 @@
     const MAX_ADSGRAM_RETRY = 15;
     let adsgramBackgroundCheckInterval = null;
     let sdkEverInitialized = false;
-    let isAdsgramPending = false;   // double‑click & retry ကာကွယ်ရန်
+    let isAdsgramPending = false;
 
-    // ==================== 🔧 UTILITY FUNCTIONS (localStorage safe) ====================
+    // ==================== 🔧 UTILITY FUNCTIONS ====================
     function safeGetItem(key, fallback = null) {
-      try {
-        const val = localStorage.getItem(key);
-        return val !== null ? val : fallback;
-      } catch (e) {
-        console.warn('localStorage getItem failed:', e);
-        return fallback;
-      }
+      try { const val = localStorage.getItem(key); return val !== null ? val : fallback; } catch (e) { return fallback; }
     }
     function safeSetItem(key, value) {
-      try {
-        localStorage.setItem(key, value);
-        return true;
-      } catch (e) {
-        console.warn('localStorage setItem failed:', e);
-        return false;
-      }
+      try { localStorage.setItem(key, value); return true; } catch (e) { return false; }
     }
-    function getStorageKey(baseKey) {
-      return baseKey + "_" + currentUserId;
-    }
+    function getStorageKey(baseKey) { return baseKey + "_" + currentUserId; }
 
     function updateBalanceDisplay() {
       const balEl = document.getElementById('balance');
@@ -481,9 +466,7 @@
       if (dispTasks) dispTasks.innerText = tasksCount;
     }
 
-    function canWatchAd(type) {
-      return getDailyAdCount(type) < MAX_DAILY_ADS;
-    }
+    function canWatchAd(type) { return getDailyAdCount(type) < MAX_DAILY_ADS; }
 
     function showStatus(elementId, message, isError = false, timeout = 5000) {
       const el = document.getElementById(elementId);
@@ -492,9 +475,7 @@
       el.style.color = isError ? '#ef4444' : '#22c55e';
       el.style.background = isError ? 'rgba(239, 68, 68, 0.08)' : 'rgba(34, 197, 94, 0.06)';
       el.innerText = message;
-      if (timeout > 0) {
-        setTimeout(() => { el.style.display = 'none'; }, timeout);
-      }
+      if (timeout > 0) { setTimeout(() => { el.style.display = 'none'; }, timeout); }
     }
 
     function updateSdkIndicator(status) {
@@ -504,15 +485,12 @@
       indicator.classList.remove('sdk-ready', 'sdk-loading', 'sdk-error');
       if (status === 'ready') {
         indicator.classList.add('sdk-ready');
-        indicator.title = 'SDK အဆင်သင့်ဖြစ်ပါပြီ';
         if (hint) hint.style.display = 'none';
       } else if (status === 'loading') {
         indicator.classList.add('sdk-loading');
-        indicator.title = 'SDK ပြင်ဆင်နေပါသည်...';
         if (hint) hint.style.display = 'block';
       } else if (status === 'error') {
         indicator.classList.add('sdk-error');
-        indicator.title = 'SDK မရရှိနိုင်ပါ - အင်တာနက်စစ်ဆေးပါ';
         if (hint) hint.style.display = 'block';
       }
     }
@@ -521,25 +499,21 @@
       isAdsgramPending = pending;
       const btn = document.getElementById('adsgramBtn');
       if (!btn) return;
-      if (pending) {
-        btn.disabled = true;
-        btn.innerText = "⏳ SDK စောင့်ဆိုင်းနေသည်...";
-      } else {
-        btn.disabled = false;
-        btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-      }
+      btn.disabled = pending;
+      btn.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO";
     }
 
-    // ==================== 📦 ADSGRAM SDK MANAGEMENT ====================
+    // ==================== 📦 ADSGRAM SDK INITIALIZE ====================
     function tryInitAdsgramSDK() {
       if (AdsgramSDK) return true;
-      if (typeof Adsgram !== 'undefined' && Adsgram && typeof Adsgram.init === 'function') {
+      if (typeof window.Adsgram !== 'undefined' && window.Adsgram && typeof window.Adsgram.init === 'function') {
         try {
-          AdsgramSDK = Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
+          // ✅ window.Adsgram.init ဟု ပြင်ဆင်ပြီး ဖြစ်ပါသည်
+          AdsgramSDK = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
           console.log('✅ Adsgram SDK initialized successfully');
           updateSdkIndicator('ready');
           sdkEverInitialized = true;
-          setAdsgramButtonPending(false);   // SDK ရလာလျှင် ခလုတ်ပြန်ဖွင့်
+          setAdsgramButtonPending(false);
           return true;
         } catch (e) {
           console.error('Adsgram init error:', e);
@@ -556,12 +530,10 @@
       if (adsgramRetryCount <= MAX_ADSGRAM_RETRY) {
         const delay = Math.min(2000 * adsgramRetryCount, 15000);
         updateSdkIndicator('loading');
-        console.log(`⏳ Adsgram SDK retry ${adsgramRetryCount}/${MAX_ADSGRAM_RETRY} in ${delay}ms`);
         setTimeout(checkAdsgramSDK, delay);
       } else {
-        console.warn('❌ Adsgram SDK not available after max retries');
         updateSdkIndicator('error');
-        setAdsgramButtonPending(false);   // အချိန်ကြာလည်း မရလျှင် ခလုတ်ပြန်ဖွင့် (error state)
+        setAdsgramButtonPending(false);
       }
       return false;
     }
@@ -587,13 +559,11 @@
         showStatus('adsgramStatus', "⏳ SDK စောင့်ဆိုင်းနေဆဲဖြစ်ပါသည်။ ခဏစောင့်ပါ...", false, 3000);
         return;
       }
-
       if (!canWatchAd('tasks')) {
-        showStatus('adsgramStatus', "❌ ယနေ့အတွက် Adsgram ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
+        showStatus('adsgramStatus', "❌ ယနေ့အတွက် Adsgram ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် ပြည့်သွားပါပြီ။", true);
         return;
       }
 
-      // SDK မရှိသေးပါက pending mode ဖြင့် retry စတင်
       if (!AdsgramSDK) {
         if (!tryInitAdsgramSDK()) {
           adsgramRetryCount = 0;
@@ -603,7 +573,6 @@
           checkAdsgramSDK();
           startBackgroundSDKCheck();
 
-          // ၆ စက္ကန့်အတွင်း SDK ရမရ စစ်ဆေး
           setTimeout(() => {
             if (AdsgramSDK) {
               showStatus('adsgramStatus', "✅ SDK အဆင်သင့်ဖြစ်ပါပြီ။ ကျေးဇူးပြု၍ ထပ်မံနှိပ်ပါ။", false, 4000);
@@ -619,7 +588,6 @@
         }
       }
 
-      // SDK အဆင်သင့်ဖြစ်လျှင် ကြော်ငြာပြသခြင်း
       const btn = document.getElementById('adsgramBtn');
       if (btn) {
         btn.disabled = true;
@@ -632,25 +600,16 @@
           setTimeout(() => {
             incrementAdCount('tasks');
             addBalance(REWARD_PER_AD);
-            if (btn) {
-              btn.disabled = false;
-              btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-            }
+            if (btn) { btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO"; }
             showStatus('adsgramStatus', `✅ ကြော်ငြာကြည့်ရှုမှု အောင်မြင်သည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
           }, 5000);
         } else {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-          }
+          if (btn) { btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO"; }
           showStatus('adsgramStatus', "⚠️ ကြော်ငြာကို အဆုံးထိ မကြည့်ခဲ့ပါ။ ထပ်စမ်းကြည့်ပါ။", true);
         }
       }).catch((err) => {
         console.error('Adsgram show error:', err);
-        if (btn) {
-          btn.disabled = false;
-          btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-        }
+        if (btn) { btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO"; }
         showStatus('adsgramStatus', "❌ ကြော်ငြာပြသစဉ် အမှားရှိနေပါသည်။ သို့မဟုတ် ကြော်ငြာမရှိသေးပါ။ ခဏနေပြီး ထပ်စမ်းကြည့်ပါ။", true);
       });
     }
@@ -658,14 +617,11 @@
     // ==================== 🎥 ADSTERRA ====================
     function openAdsterraLink() {
       if (!canWatchAd('earn')) {
-        showStatus('adsterraStatus', "❌ ယနေ့အတွက် Adsterra ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် (500) ပြည့်သွားပါပြီ။", true);
+        showStatus('adsterraStatus', "❌ ယနေ့အတွက် Adsterra ကြော်ငြာကြည့်ရှုမှု ကန့်သတ်ချက် ပြည့်သွားပါပြီ။", true);
         return;
       }
       const btn = document.getElementById('adsterraBtn');
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = "⏳ Link ဖွင့်နေသည်... (၅ စက္ကန့် စောင့်ပါ)";
-      }
+      if (btn) { btn.disabled = true; btn.innerText = "⏳ Link ဖွင့်နေသည်... (၅ စက္ကန့် စောင့်ပါ)"; }
 
       try {
         if (window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openLink === 'function') {
@@ -673,17 +629,12 @@
         } else {
           window.open(ADSTERRA_DIRECT_LINK, '_blank', 'noopener');
         }
-      } catch (e) {
-        window.open(ADSTERRA_DIRECT_LINK, '_blank', 'noopener');
-      }
+      } catch (e) { window.open(ADSTERRA_DIRECT_LINK, '_blank', 'noopener'); }
 
       setTimeout(() => {
         incrementAdCount('earn');
         addBalance(REWARD_PER_AD);
-        if (btn) {
-          btn.disabled = false;
-          btn.innerText = "🎬 WATCH EXCLUSIVE VIDEO";
-        }
+        if (btn) { btn.disabled = false; btn.innerText = "🎬 WATCH EXCLUSIVE VIDEO"; }
         showStatus('adsterraStatus', `✅ အောင်မြင်ပါသည်။ ${REWARD_PER_AD} USDT ထည့်သွင်းပြီးပါပြီ။`);
       }, 5000);
     }
@@ -692,95 +643,43 @@
     function isValidTonAddress(addr) {
       if (!addr) return false;
       addr = addr.trim();
-      const workchainHex = /^(-1|0):[0-9A-Fa-f]{64}$/;
-      if (workchainHex.test(addr)) return true;
-      const hexOnly = /^(0x)?[0-9A-Fa-f]{64}$/;
-      if (hexOnly.test(addr)) return true;
-      const b64UrlSafe = /^[A-Za-z0-9_\-]{48,52}$/;
-      if (b64UrlSafe.test(addr)) return true;
-      return false;
+      return /^(-1|0):[0-9A-Fa-f]{64}$/.test(addr) || /^(0x)?[0-9A-Fa-f]{64}$/.test(addr) || /^[A-Za-z0-9_\-]{48,52}$/.test(addr);
     }
 
     async function requestWithdraw() {
       const amountInput = document.getElementById('withdrawAmount');
       const addressInput = document.getElementById('tonAddress');
       const btn = document.getElementById('withdrawBtn');
-      const withdrawStatusId = 'withdrawStatus';
-
       if (!amountInput || !addressInput) return;
       const amount = parseFloat(amountInput.value);
       const address = addressInput.value.trim();
 
-      if (isNaN(amount) || amount <= 0) {
-        showStatus(withdrawStatusId, "❌ မှန်ကန်သော ငွေပမာဏကို ထည့်ပါ။", true); return;
-      }
-      if (amount < 0.1) {
-        showStatus(withdrawStatusId, "❌ အနည်းဆုံးထုတ်ငွေ 0.1 USDT လိုအပ်ပါသည်။", true); return;
-      }
-      if (!address || !isValidTonAddress(address)) {
-        showStatus(withdrawStatusId, "❌ မှန်ကန်သော TON လိပ်စာထည့်ပါ။", true); return;
-      }
-      if (amount > userBalance) {
-        showStatus(withdrawStatusId, "❌ လက်ကျန်မလုံလောက်ပါ။", true); return;
-      }
+      if (isNaN(amount) || amount <= 0 || amount < 0.1) { showStatus('withdrawStatus', "❌ အနည်းဆုံးထုတ်ငွေ 0.1 USDT ထည့်ပါ။", true); return; }
+      if (!address || !isValidTonAddress(address)) { showStatus('withdrawStatus', "❌ မှန်ကန်သော TON လိပ်စာထည့်ပါ။", true); return; }
+      if (amount > userBalance) { showStatus('withdrawStatus', "❌ လက်ကျန်မလုံလောက်ပါ။", true); return; }
 
-      if (btn) {
-        btn.disabled = true;
-        btn.innerText = "⏳ ပို့နေပါသည်...";
-      }
-
-      const payload = { userId: currentUserId, amount: Number(amount), address, chatId: ADMIN_ID };
+      if (btn) { btn.disabled = true; btn.innerText = "⏳ ပို့နေပါသည်..."; }
       try {
-        const resp = await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
+        const resp = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST', mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        }, 15000);
-        if (!resp.ok) throw new Error('Server returned ' + resp.status);
-        let data;
-        try { data = await resp.json(); } catch (e) { throw new Error('Invalid JSON'); }
-
+          body: JSON.stringify({ userId: currentUserId, amount: Number(amount), address, chatId: ADMIN_ID })
+        });
+        const data = await resp.json();
         if (data && data.success) {
           deductBalance(amount);
-          showStatus(withdrawStatusId, "✅ တောင်းဆိုချက် ပို့ပြီးပါပြီ။ Admin အတည်ပြုချက် စောင့်ပါ။");
-          document.getElementById('adminViewUser').innerText = currentUserId;
-          document.getElementById('adminViewAmount').innerText = amount.toFixed(4) + " USDT";
-          document.getElementById('adminViewAddress').innerText = address;
-          amountInput.value = '';
-          addressInput.value = '';
-        } else {
-          throw new Error(data?.message || 'Server rejected withdrawal');
-        }
+          showStatus('withdrawStatus', "✅ တောင်းဆိုချက် ပို့ပြီးပါပြီ။ Admin အတည်ပြုချက် စောင့်ပါ။");
+          amountInput.value = ''; addressInput.value = '';
+        } else { throw new Error(); }
       } catch (error) {
-        console.error('Withdraw error:', error);
-        showStatus(withdrawStatusId, "❌ တောင်းဆိုမှု မအောင်မြင်ပါ။ အင်တာနက် သို့မဟုတ် server ပြဿနာ ဖြစ်နိုင်သည်။", true);
-      } finally {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerText = "CONFIRM WITHDRAWAL";
-        }
-      }
+        showStatus('withdrawStatus', "❌ တောင်းဆိုမှု မအောင်မြင်ပါ။", true);
+      } finally { if (btn) { btn.disabled = false; btn.innerText = "CONFIRM WITHDRAWAL"; } }
     }
 
     function adminAction(type) {
-      const msg = type === 'approve' ? "✅ အတည်ပြုလိုက်ပါပြီ။" : "❌ ငြင်းပယ်လိုက်ပါပြီ။";
-      showStatus('adminStatus', msg, type !== 'approve');
+      showStatus('adminStatus', type === 'approve' ? "✅ အတည်ပြုလိုက်ပါပြီ။" : "❌ Ngatပယ်လိုက်ပါပြီ။", type !== 'approve');
     }
 
-    function fetchWithTimeout(resource, options = {}, timeout = 10000) {
-      return new Promise((resolve, reject) => {
-        const timer = setTimeout(() => reject(new Error('Request timeout')), timeout);
-        fetch(resource, options).then((response) => {
-          clearTimeout(timer);
-          resolve(response);
-        }).catch((err) => {
-          clearTimeout(timer);
-          reject(err);
-        });
-      });
-    }
-
-    // ==================== 🔘 TAB NAVIGATION ====================
     function setupTabNavigation() {
       const tabButtons = document.querySelectorAll('.tab-btn');
       const tabContents = document.querySelectorAll('.tab-content');
@@ -800,36 +699,24 @@
     function initApp() {
       try {
         if (window.Telegram && window.Telegram.WebApp) {
-          if (typeof window.Telegram.WebApp.ready === 'function') window.Telegram.WebApp.ready();
-          if (typeof window.Telegram.WebApp.expand === 'function') window.Telegram.WebApp.expand();
+          window.Telegram.WebApp.ready();
+          window.Telegram.WebApp.expand();
           const user = window.Telegram.WebApp.initDataUnsafe?.user;
           if (user && user.id) currentUserId = String(user.id);
         }
-      } catch (e) { console.log("Telegram init error:", e); }
+      } catch (e) {}
 
       document.getElementById('displayUserId').innerText = currentUserId;
+      if (currentUserId === ADMIN_ID) document.getElementById('adminTabButton').style.display = 'flex';
 
-      if (currentUserId === ADMIN_ID) {
-        document.getElementById('adminTabButton').style.display = 'flex';
-      }
-
-      const stored = safeGetItem(getStorageKey('app_usdt_balance'), '0');
-      userBalance = parseFloat(stored) || 0;
-
+      userBalance = parseFloat(safeGetItem(getStorageKey('app_usdt_balance'), '0')) || 0;
       const refLinkInput = document.getElementById('refLink');
-      if (refLinkInput) {
-        refLinkInput.value = "https://t.me/YokaGridZenith_bot" + encodeURIComponent(currentUserId);
-      }
+      if (refLinkInput) refLinkInput.value = "https://t.me/YokaGridZenith_bot?start=" + encodeURIComponent(currentUserId);
+      
       document.getElementById('copyRefBtn').addEventListener('click', async () => {
         try {
-          if (navigator.clipboard?.writeText) {
-            await navigator.clipboard.writeText(refLinkInput.value);
-          } else {
-            refLinkInput.select();
-            document.execCommand('copy');
-          }
-          alert('Referral link copied!');
-        } catch (err) { alert('Copy failed — please copy manually.'); }
+          refLinkInput.select(); document.execCommand('copy'); alert('Referral link copied!');
+        } catch (err) { alert('Copy failed.'); }
       });
 
       updateBalanceDisplay();
@@ -837,21 +724,11 @@
       updateDailyCountDisplay();
       setupTabNavigation();
 
-      // SDK initial check
       updateSdkIndicator('loading');
-      if (!tryInitAdsgramSDK()) {
-        adsgramRetryCount = 0;
-        checkAdsgramSDK();
-        startBackgroundSDKCheck();
-      }
-      console.log('🚀 App ready. User:', currentUserId, 'SDK:', !!AdsgramSDK);
+      if (!tryInitAdsgramSDK()) { adsgramRetryCount = 0; checkAdsgramSDK(); startBackgroundSDKCheck(); }
     }
 
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initApp);
-    } else {
-      initApp();
-    }
+    if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initApp); } else { initApp(); }
   </script>
 </body>
 </html>
