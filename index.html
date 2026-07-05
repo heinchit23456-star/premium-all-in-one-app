@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="my">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -266,7 +268,7 @@
     <!-- 🔄 Tasks Tab -->
     <div id="tab-tasks" class="tab-content active">
       <h2 style="font-size: 1.2rem; margin-bottom: 8px; color: #00aaff;">📺 Watch & Earn</h2>
-      <div class="admin-box" style="padding: 12px; font-size: 0.85rem;">
+      <div class="admin-box" style="padding: 2px; font-size: 0.85rem;">
         🆔 User ID: <span id="displayUserId" style="color:#00aaff; font-weight:bold;">Loading...</span>
       </div>
       <div class="admin-box" style="text-align: center;">
@@ -279,24 +281,34 @@
       <!-- Adsterra Section -->
       <div class="admin-box" style="text-align: center;">
         <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 4px;">Adsterra ကြော်ငြာ</p>
-        <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">📊 ယနေ့ကြည့်ရှုမှု: <span id="dailyCountEarn">0</span>/500</div>
+        <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">📊 ယနေ့ကြည့်ရှုမှု: <span id="dailyCountEarn">0</span>/500</div>
         <button class="btn-gold-action" id="adsterraBtn" onclick="openAdsterraLink()">🎬 WATCH EXCLUSIVE VIDEO</button>
         <p id="adsterraStatus" class="status-message"></p>
       </div>
 
-      <!-- Adsgram Section -->
+      <!-- Adsgram Section 1 (ခလုတ်အဟောင်း) -->
       <div class="admin-box" style="text-align: center;">
-        <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 4px;">
-          Adsgram ကြော်ငြာ
+        <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 5px;">
+          Adsgram ကြော်ငြာ ၁ (၃၇၁၉၅)
           <span id="sdkIndicator" class="sdk-status-indicator sdk-loading" title="SDK အဆင်သင့်ဖြစ်မှု"></span>
         </p>
         <p style="font-size:0.8rem; color:#aaa; margin-bottom:2px;">ဆုကြေး + 0.0005 USDT</p>
         <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">📊 ယနေ့ကြည့်ရှုမှု: <span id="dailyCountTasks">0</span>/500</div>
-        <button class="btn-gold-action" id="adsgramBtn" onclick="triggerAdsgramVideo()">🚀 WATCH ADSGRAM VIDEO</button>
+        <button class="btn-gold-action" id="adsgramBtn" onclick="triggerAdsgramVideo('old')">🚀 WATCH ADSGRAM VIDEO 1</button>
         <p id="adsgramStatus" class="status-message"></p>
         <p id="adsgramSdkHint" style="font-size:0.7rem; color:#7882a5; margin-top:6px; display:none;">
           💡 SDK မရရှိသေးပါက စက္ကန့်အနည်းငယ်စောင့်ပြီး ထပ်စမ်းကြည့်ပါ။
         </p>
+      </div>
+
+      <!-- Adsgram Section 2 (ခလုတ်အသစ်) -->
+      <div class="admin-box" style="text-align: center;">
+        <p style="font-size: 1rem; color: #7882a5; margin-bottom: 4px;">
+          Adsgram ကြော်ငြာ ၂ (int-37376)
+        </p>
+        <p style="font-size:1rem; color:#aaa; margin-bottom:1px;">ဆုကြေး + 0.0005 USDT</p>
+        <button class="btn-gold-action" id="adsgramBtnNew" onclick="triggerAdsgramVideo('new')">🚀 WATCH ADSGRAM VIDEO 2</button>
+        <p id="adsgramStatusNew" class="status-message"></p>
       </div>
     </div>
 
@@ -337,7 +349,7 @@
     <div id="tab-admin" class="tab-content">
       <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🛡️ Admin Withdrawal Panel</h2>
       <div class="admin-box" id="adminContainer">
-        <p style="text-align:center; color:#7882a5;">⏳ ငွေထုတ်တောင်းဆိုချက်များ စစ်ဆေးနေသည်...</p>
+        <p style="text-align:center; color:#7882a5;">⏳ Ngwe htot taung so chatများ sit say nay thel...</p>
       </div>
     </div>
 
@@ -352,19 +364,20 @@
 
   <script>
     // ==================== ⚙️ CONFIGURATION ====================
-    const ADSGRAM_BLOCK_ID = "37195";
+    const ADSGRAM_BLOCK_ID_OLD = "37195";   // ခလုတ် ၁ အတွက် ID အဟောင်း
+    const ADSGRAM_BLOCK_ID_NEW = "int-37376"; // ခလုတ် ၂ အတွက် ID အသစ်
     const ADSTERRA_DIRECT_LINK = "https://potterynaggingformerly.com/r95xxkue6r?key=cde20067d822c42373a4ea5deb13d66a";
-    const ADMIN_ID = "8842061595"; // ဒါကိုလည်း Server ကနေ စစ်တာက ပိုကောင်းပါတယ်
+    const ADMIN_ID = "8885251250";
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKQOQWnH-fVW-0qJt9aARUBXAH098lfo6thIDo6dZPTK15g7AQhi0a4ojJHWMsCr4/exec";
     const REWARD_PER_AD = 0.0005;
     const MAX_DAILY_ADS = 500;
 
     let currentUserId = "anonymous";
-    let AdsgramSDK = null;
+    let AdsgramSDK_Old = null;
+    let AdsgramSDK_New = null;
     let userBalance = 0;
     let adsgramRetryCount = 0;
     const MAX_ADSGRAM_RETRY = 15;
-    let adsgramBackgroundCheckInterval = null;
     let isAdsgramPending = false;
 
     // ==================== 🔧 UTILITY FUNCTIONS ====================
@@ -381,7 +394,6 @@
       document.getElementById('walletBalance').innerText = userBalance.toFixed(4);
     }
 
-    // ⚠️ ဤနေရာတွင် Balance ကို Local မှာပဲ စီမံထားသောကြောင့် အန္တရာယ်ရှိကြောင်း သတိပေးအပ်ပါသည်
     function addBalance(amount) {
       userBalance = Math.max(0, userBalance + amount);
       safeSetItem(getStorageKey('app_usdt_balance'), userBalance.toString());
@@ -451,14 +463,14 @@
 
     // ==================== 📦 ADSGRAM SDK ====================
     function tryInitAdsgramSDK() {
-      if (AdsgramSDK) return true;
+      if (AdsgramSDK_Old && AdsgramSDK_New) return true;
       if (typeof window.Adsgram !== 'undefined' && window.Adsgram.init) {
         try {
-          AdsgramSDK = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID });
-          console.log('✅ Adsgram SDK initialized');
+          if (!AdsgramSDK_Old) AdsgramSDK_Old = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID_OLD });
+          if (!AdsgramSDK_New) AdsgramSDK_New = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID_NEW });
+          console.log('✅ Adsgram SDKs initialized');
           updateSdkIndicator('ready');
           setAdsgramButtonPending(false);
-          if (adsgramBackgroundCheckInterval) { clearInterval(adsgramBackgroundCheckInterval); adsgramBackgroundCheckInterval = null; }
           return true;
         } catch (e) { updateSdkIndicator('error'); return false; }
       }
@@ -467,10 +479,16 @@
 
     function setAdsgramButtonPending(pending) {
       isAdsgramPending = pending;
-      const btn = document.getElementById('adsgramBtn');
-      if (!btn) return;
-      btn.disabled = pending;
-      btn.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO";
+      const btnOld = document.getElementById('adsgramBtn');
+      const btnNew = document.getElementById('adsgramBtnNew');
+      if (btnOld) {
+        btnOld.disabled = pending;
+        btnOld.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO 1";
+      }
+      if (btnNew) {
+        btnNew.disabled = pending;
+        btnNew.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO 2";
+      }
     }
 
     function checkAdsgramSDK() {
@@ -484,36 +502,51 @@
       }
     }
 
-    function triggerAdsgramVideo() {
-      if (isAdsgramPending) { showStatus('adsgramStatus', "⏳ SDK စောင့်ဆိုင်းနေဆဲ...", false, 3000); return; }
-      if (!canWatchAd('tasks')) { showStatus('adsgramStatus', "❌ ယနေ့ကန့်သတ်ချက်ပြည့်သွားပါပြီ။", true); return; }
+    function triggerAdsgramVideo(type) {
+      if (isAdsgramPending) { 
+        const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
+        showStatus(statusId, "⏳ SDK စောင့်ဆိုင်းနေဆဲ...", false, 3000); 
+        return; 
+      }
+      if (!canWatchAd('tasks')) { 
+        const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
+        showStatus(statusId, "❌ ယနေ့ကန့်သတ်ချက်ပြည့်သွားပါပြီ။", true); 
+        return; 
+      }
 
-      if (!AdsgramSDK) {
+      if (!AdsgramSDK_Old || !AdsgramSDK_New) {
         if (!tryInitAdsgramSDK()) {
           adsgramRetryCount = 0; updateSdkIndicator('loading'); setAdsgramButtonPending(true);
-          showStatus('adsgramStatus', "⏳ SDK ပြင်ဆင်နေပါသည်...", false, 4000);
+          const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
+          showStatus(statusId, "⏳ SDK ပြင်ဆင်နေပါသည်...", false, 4000);
           checkAdsgramSDK();
           return;
         }
       }
 
-      const btn = document.getElementById('adsgramBtn');
+      const activeSDK = type === 'old' ? AdsgramSDK_Old : AdsgramSDK_New;
+      const btnId = type === 'old' ? 'adsgramBtn' : 'adsgramBtnNew';
+      const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
+      const defaultText = type === 'old' ? "🚀 WATCH ADSGRAM VIDEO 1" : "🚀 WATCH ADSGRAM VIDEO 2";
+
+      const btn = document.getElementById(btnId);
       btn.disabled = true; btn.innerText = "⏳ ကြော်ငြာ ခေါ်ယူနေသည်...";
-      AdsgramSDK.show().then(result => {
+
+      activeSDK.show().then(result => {
         if (result?.done) {
-          btn.innerText = "⏳ ၅ စက္ကန့် စောင့်ပါ...";
+          btn.innerText = "⏳ 1 စက္ကန့် စောင့်ပါ...";
           setTimeout(() => {
             incrementAdCount('tasks'); addBalance(REWARD_PER_AD);
-            btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-            showStatus('adsgramStatus', `✅ အောင်မြင်သည်။ +${REWARD_PER_AD} USDT`);
+            btn.disabled = false; btn.innerText = defaultText;
+            showStatus(statusId, `✅ အောင်မြင်သည်။ +${REWARD_PER_AD} USDT`);
           }, 5000);
         } else {
-          btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-          showStatus('adsgramStatus', "⚠️ ကြော်ငြာမပြီးပါ။", true);
+          btn.disabled = false; btn.innerText = defaultText;
+          showStatus(statusId, "⚠️ ကြော်ငြာမပြီးပါ။", true);
         }
       }).catch(() => {
-        btn.disabled = false; btn.innerText = "🚀 WATCH ADSGRAM VIDEO";
-        showStatus('adsgramStatus', "❌ ကြော်ငြာမရှိသေးပါ။", true);
+        btn.disabled = false; btn.innerText = defaultText;
+        showStatus(statusId, "❌ ကြော်ငြာမရှိသေးပါ။", true);
       });
     }
 
@@ -619,12 +652,11 @@
       document.getElementById('displayUserId').innerText = currentUserId;
       if (currentUserId === ADMIN_ID) {
         document.getElementById('adminTabButton').style.display = 'flex';
-        // Admin Tab ကိုနှိပ်တိုင်း စာရင်းအသစ်တင်မယ်
         document.querySelector('[data-tab="admin"]').addEventListener('click', loadPendingWithdrawals);
       }
 
       userBalance = parseFloat(safeGetItem(getStorageKey('app_usdt_balance'), '0')) || 0;
-      document.getElementById('refLink').value = `https://t.me/YokaGridZenith_bot?start=${currentUserId}`;
+      document.getElementById('refLink').value = `https://t.me/xgjcxp_bot?start=${currentUserId}`;
 
       document.getElementById('copyRefBtn').addEventListener('click', async () => {
         try {
