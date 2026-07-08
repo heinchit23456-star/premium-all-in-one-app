@@ -1,336 +1,123 @@
 <!DOCTYPE html>
-<html lang="my">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Premium All-In-One App + Secure Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Premium App - 50 Daily Limit</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <!-- ✅ Adsgram SDK Script -->
   <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', system-ui, sans-serif;
-    }
-    body {
-      background: radial-gradient(circle at top, #1a1b35 0%, #0d0e1a 100%);
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      padding: 15px;
-      color: #f5f5f5;
-      margin: 0;
-    }
-    .container {
-      background: rgba(23, 25, 48, 0.85);
-      border: 1px solid rgba(0, 136, 204, 0.2);
-      border-radius: 24px;
-      padding: 22px;
-      width: 100%;
-      max-width: 450px;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(12px);
-      display: flex;
-      flex-direction: column;
-    }
-    .tab-bar {
-      display: flex;
-      background: #0c0d17;
-      padding: 5px;
-      border-radius: 16px;
-      margin-top: 22px;
-      border: 1px solid #1f213a;
-      overflow-x: auto;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 12px 5px;
-      background: transparent;
-      border: none;
-      color: #7882a5;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.9rem;
-      border-radius: 12px;
-      transition: all 0.3s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      min-width: 65px;
-    }
-    .tab-btn.active {
-      background: #0088cc;
-      color: #ffffff;
-      font-weight: 700;
-      box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
-    }
-    .tab-content {
-      display: none;
-      flex-grow: 1;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .admin-box {
-      background: #131529;
-      border: 1px solid rgba(0, 136, 204, 0.1);
-      border-radius: 16px;
-      padding: 18px;
-      margin-bottom: 16px;
-      box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.02);
-    }
-    .alert-box-dark {
-      background: rgba(0, 136, 204, 0.08);
-      color: #00aaff;
-      padding: 12px;
-      border-radius: 12px;
-      font-size: 0.8rem;
-      text-align: center;
-      margin-bottom: 18px;
-      border: 1px solid rgba(0, 136, 204, 0.2);
-    }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #00aaff;
-      margin-bottom: 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .form-group input {
-      width: 100%;
-      padding: 14px;
-      background: #090a14;
-      border: 1px solid #1f213a;
-      border-radius: 10px;
-      color: white;
-      font-size: 0.95rem;
-      transition: border 0.2s;
-    }
-    .form-group input:focus {
-      outline: none;
-      border-color: #00aaff;
-      box-shadow: 0 0 8px rgba(0, 136, 204, 0.3);
-    }
-    .btn-gold-action {
-      width: 100%;
-      padding: 16px;
-      background: linear-gradient(135deg, #0088cc 0%, #005580 100%);
-      border: none;
-      border-radius: 14px;
-      font-weight: 800;
-      color: #fff;
-      cursor: pointer;
-      font-size: 1rem;
-      text-transform: uppercase;
-      box-shadow: 0 5px 18px rgba(0, 136, 204, 0.3);
-      transition: all 0.2s;
-      margin-bottom: 10px;
-    }
-    .btn-gold-action:active {
-      transform: scale(0.97);
-    }
-    .btn-gold-action:disabled {
-      background: #334155;
-      color: #94a3b8;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .btn-premium-withdraw {
-      width: 100%;
-      padding: 16px;
-      background: #00b074;
-      color: #ffffff;
-      border: none;
-      border-radius: 14px;
-      font-weight: 800;
-      font-size: 1rem;
-      cursor: pointer;
-      text-transform: uppercase;
-      box-shadow: 0 4px 15px rgba(0, 176, 116, 0.3);
-      transition: all 0.2s;
-    }
-    .btn-premium-withdraw:active {
-      transform: scale(0.97);
-    }
-    .btn-premium-withdraw:disabled {
-      background: #334155;
-      color: #94a3b8;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
-    .address-box {
-      background: #090a14;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #1f213a;
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: #00aaff;
-      margin: 8px 0;
-      word-break: break-all;
-    }
-    .action-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .btn-approve {
-      flex: 1;
-      padding: 10px;
-      background: #22c55e;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .btn-reject {
-      flex: 1;
-      padding: 10px;
-      background: #ef4444;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    .status-message {
-      margin-top: 12px;
-      font-size: 0.85rem;
-      text-align: center;
-      display: none;
-      font-weight: bold;
-      padding: 8px;
-      border-radius: 8px;
-    }
-    .referral-console {
-      background: #131529;
-      border: 1px solid #1f213a;
-      border-radius: 16px;
-      padding: 15px;
-      margin-bottom: 16px;
-    }
-    .referral-console h3 {
-      font-size: 1rem;
-      color: #00aaff;
-      margin-bottom: 5px;
-    }
-    .referral-link {
-      width: 100%;
-      padding: 10px;
-      background: #090a14;
-      border: 1px solid #1f213a;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.85rem;
-      margin-bottom: 8px;
-    }
-    .btn-copy {
-      width: 100%;
-      padding: 10px;
-      background: #0088cc;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
-    .sdk-status-indicator {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      margin-left: 6px;
-      vertical-align: middle;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    body { background: radial-gradient(circle at 20% 10%, #1e1f3a 0%, #000080 100%); display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; padding: 15px; color: #f0f0f0; margin: 0; }
+    .container { background: rgba(20, 22, 45, 0.9); border: 1px solid rgba(0, 136, 204, 0.25); border-radius: 28px; padding: 20px 16px; width: 100%; max-width: 450px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6); backdrop-filter: blur(16px); display: flex; flex-direction: column; }
+    .tab-bar { display: flex; background: #0c0d1b; padding: 4px; border-radius: 18px; margin-top: 20px; border: 1px solid #232540; overflow-x: auto; }
+    .tab-btn { flex: 1; padding: 12px 4px; background: transparent; border: none; color: #8a92b0; font-weight: 600; cursor: pointer; font-size: 0.85rem; border-radius: 14px; transition: all 0.25s; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 65px; }
+    .tab-btn.active { background: #0088cc; color: #ffffff; font-weight: 700; box-shadow: 0 6px 18px rgba(0, 136, 204, 0.45); }
+    .tab-content { display: none; flex-grow: 1; }
+    .tab-content.active { display: block; }
+    .admin-box { background: #12132a; border: 1px solid rgba(0, 136, 204, 0.15); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: inset 0 1px 4px rgba(255, 255, 255, 0.02); }
+    .alert-box-dark { background: rgba(0, 136, 204, 0.1); color: #3bccff; padding: 12px; border-radius: 14px; font-size: 0.85rem; margin-bottom: 16px; border: 1px solid rgba(0, 136, 204, 0.25); position: relative; overflow: hidden; white-space: nowrap; width: 100%; box-sizing: border-box; display: block; }
+    .moving-text { display: inline-block; padding-left: 100%; animation: marquee 14s linear infinite; font-weight: bold; }
+    @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+    .btn-gold-action { width: 100%; padding: 14px; background: linear-gradient(135deg, #0088cc 0%, #004466 100%); border: none; border-radius: 14px; font-weight: 800; color: #fff; cursor: pointer; font-size: 0.9rem; text-transform: uppercase; box-shadow: 0 6px 20px rgba(0, 136, 204, 0.35); transition: all 0.2s; margin-bottom: 8px; position: relative; overflow: hidden; white-space: nowrap; display: block; text-align: left; }
+    .btn-marquee { display: inline-block; padding-left: 100%; animation: marquee 10s linear infinite; }
+    .btn-gold-action:active { transform: scale(0.97); }
+    .btn-gold-action:disabled { background: #2d3148; color: #8890a5; cursor: not-allowed; box-shadow: none; }
+    .btn-gold-action:disabled .btn-marquee { animation-play-state: paused; padding-left: 0; text-align: center; width: 100%; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: #3bccff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+    .form-group input { width: 100%; padding: 13px; background: #0a0b16; border: 1px solid #232540; border-radius: 12px; color: white; font-size: 0.95rem; transition: border 0.2s; }
+    .form-group input:focus { outline: none; border-color: #3bccff; box-shadow: 0 0 10px rgba(0, 136, 204, 0.4); }
+    .btn-premium-withdraw { width: 100%; padding: 15px; background: #00b074; color: #ffffff; border: none; border-radius: 14px; font-weight: 800; font-size: 1rem; cursor: pointer; text-transform: uppercase; box-shadow: 0 5px 18px rgba(0, 176, 116, 0.35); transition: all 0.2s; }
+    .btn-premium-withdraw:active { transform: scale(0.97); }
+    .btn-premium-withdraw:disabled { background: #334155; color: #94a3b8; cursor: not-allowed; box-shadow: none; }
+    .address-box { background: #0a0b16; padding: 10px; border-radius: 10px; border: 1px solid #232540; font-family: monospace; font-size: 0.8rem; color: #3bccff; margin: 8px 0; word-break: break-all; }
+    .action-group { display: flex; gap: 10px; margin-top: 12px; }
+    .btn-approve { flex: 1; padding: 10px; background: #22c55e; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    .btn-reject { flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+    .status-message { margin-top: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: bold; padding: 8px; border-radius: 10px; }
+    .referral-console { background: #13142b; border: 1px solid #232540; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+    .referral-console h3 { font-size: 1rem; color: #3bccff; margin-bottom: 4px; }
+    .referral-link { width: 100%; padding: 12px; background: #090a16; border: 1px solid #232540; border-radius: 10px; color: #fff; font-size: 0.85rem; margin-bottom: 10px; }
+    .btn-copy { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+    .sdk-status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-left: 6px; vertical-align: middle; }
     .sdk-ready { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
     .sdk-loading { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; animation: pulse 1.5s infinite; }
     .sdk-error { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    .ad-section { border-top: 1px solid #1f213a; margin-top: 20px; padding-top: 20px; }
-    .pending-request { margin-bottom: 12px; padding: 10px; background: #0d0e1a; border-radius: 8px; }
+    .pending-request { margin-bottom: 12px; padding: 10px; background: #0d0e1f; border-radius: 10px; }
+    #refRewardMessage { font-size:0.8rem; margin-top:8px; display:none; text-align:center; }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="alert-box-dark">🙋🏻‍♂️Yoka 🎁Grid 📺Zenith_bot🤑</div>
+    <div class="alert-box-dark">
+        <span class="moving-text" id="topMarqueeText">🙋🏻‍♂️Yoka 🎁Grid 📺Zenith_bot🤑</span>
+    </div>
 
-    <!-- 🔄 Tasks Tab -->
     <div id="tab-tasks" class="tab-content active">
-      <h2 style="font-size: 1.2rem; margin-bottom: 8px; color: #00aaff;">📺 Watch & Earn</h2>
-      <div class="admin-box" style="padding: 2px; font-size: 0.85rem;">
-        🆔 User ID: <span id="displayUserId" style="color:#00aaff; font-weight:bold;">Loading...</span>
+      <h2 style="font-size: 1.2rem; margin-bottom: 8px; color: #3bccff;">📺 Watch & Earn</h2>
+      <div class="admin-box" style="padding: 12px; font-size: 0.85rem;">
+        🆔 User ID: <span id="displayUserId" style="color:#3bccff; font-weight:bold;">Loading...</span>
       </div>
       <div class="admin-box" style="text-align: center;">
-        <div style="font-size: 0.85rem; color: #7882a5;">💰 USDT BALANCE</div>
-        <div style="font-size: 1.7rem; font-weight: bold; color: #00aaff; margin: 4px 0;" id="balance">0.0000</div>
-        <!-- ⚠️ သတိပေးချက် -->
-        <p style="font-size:0.65rem; color:#ef4444; margin-top:5px; display:none;" id="securityWarning">⚠️ လက်ကျန်ပမာဏကို Server မှ အတည်ပြုခြင်းမရှိပါ။</p>
+        <div style="font-size: 0.85rem; color: #8a92b0;">💰 USDT BALANCE</div>
+        <div style="font-size: 1.9rem; font-weight: bold; color: #3bccff; margin: 4px 0;" id="balance">0.0000</div>
       </div>
 
-      <!-- Adsterra Section -->
       <div class="admin-box" style="text-align: center;">
-        <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 4px;">Adsterra ကြော်ငြာ</p>
-        <div style="font-size:0.8rem; color:#aaa; margin-bottom:5px;">📊 ယနေ့ကြည့်ရှုမှု: <span id="dailyCountEarn">0</span>/500</div>
-        <button class="btn-gold-action" id="adsterraBtn" onclick="openAdsterraLink()">🎬 WATCH EXCLUSIVE VIDEO</button>
+        <p style="font-size: 0.9rem; color: #8a92b0; margin-bottom: 4px;">Watch daily</p>
+        <div style="font-size:0.8rem; color:#aaa; margin-bottom:6px;">📊 : <span id="dailyCountEarn">0/50</span></div>
+        <button class="btn-gold-action" id="adsterraBtn" onclick="openAdsterraLink()">
+          <span class="btn-marquee" id="adsterraBtnText">🎬 WATCH EXCLUSIVE VIDEO — CLICK HERE TO EARN NOW!</span>
+        </button>
         <p id="adsterraStatus" class="status-message"></p>
       </div>
 
-      <!-- Adsgram Section 1 (ခလုတ်အဟောင်း) -->
       <div class="admin-box" style="text-align: center;">
-        <p style="font-size: 0.9rem; color: #7882a5; margin-bottom: 5px;">
-          Adsgram ကြော်ငြာ ၁ (၃၇၁၉၅)
-          <span id="sdkIndicator" class="sdk-status-indicator sdk-loading" title="SDK အဆင်သင့်ဖြစ်မှု"></span>
+        <p style="font-size: 0.9rem; color: #8a92b0; margin-bottom: 5px;">
+          📊 Watch daily
+          <span id="sdkIndicator" class="sdk-status-indicator sdk-loading" title="SDK Status Readiness"></span>
         </p>
-        <p style="font-size:0.8rem; color:#aaa; margin-bottom:2px;">ဆုကြေး + 0.0005 USDT</p>
-        <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">📊 ယနေ့ကြည့်ရှုမှု: <span id="dailyCountTasks">0</span>/500</div>
-        <button class="btn-gold-action" id="adsgramBtn" onclick="triggerAdsgramVideo('old')">🚀 WATCH ADSGRAM VIDEO 1</button>
+        <p style="font-size:0.8rem; color:#aaa; margin-bottom:2px;">Reward + 0.0001 USDT</p>
+        <div style="font-size:0.8rem; color:#aaa; margin-bottom:8px;">📊 Watch daily: <span id="dailyCountTasks">0/500</span></div>
+        <button class="btn-gold-action" id="adsgramBtn" onclick="triggerAdsgramVideo('old')">
+          <span class="btn-marquee" id="adsgramBtnText">🚀 WATCH ADSGRAM VIDEO 1 — HIGH REWARD BONUS!</span>
+        </button>
         <p id="adsgramStatus" class="status-message"></p>
-        <p id="adsgramSdkHint" style="font-size:0.7rem; color:#7882a5; margin-top:6px; display:none;">
-          💡 SDK မရရှိသေးပါက စက္ကန့်အနည်းငယ်စောင့်ပြီး ထပ်စမ်းကြည့်ပါ။
+        <p id="adsgramSdkHint" style="font-size:0.7rem; color:#8a92b0; margin-top:6px; display:none;">
+          💡 Please wait a few seconds if the SDK is not ready yet.
         </p>
       </div>
 
-      <!-- Adsgram Section 2 (ခလုတ်အသစ်) -->
       <div class="admin-box" style="text-align: center;">
-        <p style="font-size: 1rem; color: #7882a5; margin-bottom: 4px;">
-          Adsgram ကြော်ငြာ ၂ (int-37376)
-        </p>
-        <p style="font-size:1rem; color:#aaa; margin-bottom:1px;">ဆုကြေး + 0.0005 USDT</p>
-        <button class="btn-gold-action" id="adsgramBtnNew" onclick="triggerAdsgramVideo('new')">🚀 WATCH ADSGRAM VIDEO 2</button>
+        <p style="font-size: 0.9rem; color: #8a92b0; margin-bottom: 4px;">Watch daily</p>
+        <p style="font-size:0.8rem; color:#aaa; margin-bottom:4px;">Reward + 0.0001 USDT</p>
+        <button class="btn-gold-action" id="adsgramBtnNew" onclick="triggerAdsgramVideo('new')">
+          <span class="btn-marquee" id="adsgramBtnNewText">🚀 WATCH ADSGRAM VIDEO 2 — CLICK NOW TO WATCH!</span>
+        </button>
         <p id="adsgramStatusNew" class="status-message"></p>
       </div>
     </div>
 
-    <!-- 💎 Refs Tab -->
     <div id="tab-refs" class="tab-content">
-      <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">👥 Referral Program</h2>
+      <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #3bccff;">👥 Referral Program</h2>
       <div class="referral-console">
         <h3>Your Referral Link</h3>
-        <p style="font-size:0.8rem; margin-bottom:0.6rem;">💎 One-time: $0.01 · Lifetime share: 5%</p>
+        <p style="font-size:0.8rem; margin-bottom:0.8rem;">💎 One-time: $0.01 · Lifetime share: 5%</p>
         <label style="font-size:0.7rem; color:#9aa4bf;">SHARE & EARN</label>
         <input type="text" id="refLink" readonly class="referral-link" onclick="this.select();">
         <button class="btn-copy" id="copyRefBtn">📋 COPY LINK</button>
-        <p style="font-size:0.95rem; color:#7f8aa0; margin-top:0.5rem;">🎁 ဖိတ်ခေါ်ခြင်းဖြင့် ဆုကြေးများ ရယူပါ။</p>
+        <p style="font-size:0.95rem; color:#7f8aa0; margin-top:0.8rem;">🎁 Invite Friends to Earn Rewards.</p>
+        <p id="refRewardMessage" style="display:none; color:#22c55e; font-weight:bold;"></p>
       </div>
     </div>
 
-    <!-- 💼 Wallet Tab -->
     <div id="tab-wallet" class="tab-content">
       <div class="admin-box">
         <div style="text-align: center; margin-bottom: 20px;">
-          <span style="font-size: 0.8rem; color: #7882a5;">WITHDRAWABLE USDT BALANCE</span>
-          <h2 style="color: #00aaff; font-size: 1.8rem; margin-top: 3px;" id="walletBalance">0.0000</h2>
+          <span style="font-size: 0.8rem; color: #8a92b0;">WITHDRAWABLE USDT BALANCE</span>
+          <h2 style="color: #3bccff; font-size: 1.8rem; margin-top: 3px;" id="walletBalance">0.0000</h2>
         </div>
         <div class="form-group">
           <label>Withdraw Amount (USDT) <span style="color: #ef4444;">(Min: 0.1)</span></label>
@@ -345,32 +132,31 @@
       </div>
     </div>
 
-    <!-- 🛡️ Admin Tab -->
     <div id="tab-admin" class="tab-content">
-      <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #00aaff;">🛡️ Admin Withdrawal Panel</h2>
+      <h2 style="font-size: 1.2rem; margin-bottom: 15px; color: #3bccff;">🛡️ Admin Withdrawal Panel</h2>
       <div class="admin-box" id="adminContainer">
-        <p style="text-align:center; color:#7882a5;">⏳ Ngwe htot taung so chatများ sit say nay thel...</p>
+        <p style="text-align:center; color:#8a92b0;">⏳ Fetching pending requests...</p>
       </div>
     </div>
 
-    <!-- 🔘 Tab Bar -->
     <div class="tab-bar">
       <button class="tab-btn active" data-tab="tasks"><span>📺</span><span>Tasks</span></button>
       <button class="tab-btn" data-tab="refs"><span>💎</span><span>Refs</span></button>
       <button class="tab-btn" data-tab="wallet"><span>💼</span><span>Wallet</span></button>
-      <button class="tab-btn" id="adminTabButton" data-tab="admin" style="display: none; border: 1px dashed #00aaff;">🛡️ Admin</button>
+      <button class="tab-btn" id="adminTabButton" data-tab="admin" style="display: none; border: 1px dashed #3bccff;">🛡️ Admin</button>
     </div>
   </div>
 
   <script>
-    // ==================== ⚙️ CONFIGURATION ====================
-    const ADSGRAM_BLOCK_ID_OLD = "37195";   // ခလုတ် ၁ အတွက် ID အဟောင်း
-    const ADSGRAM_BLOCK_ID_NEW = "int-37376"; // ခလုတ် ၂ အတွက် ID အသစ်
+    const ADSGRAM_BLOCK_ID_OLD = "37195";   
+    const ADSGRAM_BLOCK_ID_NEW = "int-37376"; 
     const ADSTERRA_DIRECT_LINK = "https://potterynaggingformerly.com/r95xxkue6r?key=cde20067d822c42373a4ea5deb13d66a";
-    const ADMIN_ID = "8885251250";
+    const ADMIN_ID = "8866558733";
     const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyKQOQWnH-fVW-0qJt9aARUBXAH098lfo6thIDo6dZPTK15g7AQhi0a4ojJHWMsCr4/exec";
-    const REWARD_PER_AD = 0.0005;
-    const MAX_DAILY_ADS = 500;
+    const REWARD_PER_AD = 0.0001;
+    const REFERRAL_REWARD = 0.01; 
+    const MAX_DAILY_EARN = 50;   
+    const MAX_DAILY_TASKS = 500; 
 
     let currentUserId = "anonymous";
     let AdsgramSDK_Old = null;
@@ -380,7 +166,6 @@
     const MAX_ADSGRAM_RETRY = 15;
     let isAdsgramPending = false;
 
-    // ==================== 🔧 UTILITY FUNCTIONS ====================
     function safeGetItem(key, fallback = null) {
       try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
     }
@@ -394,10 +179,18 @@
       document.getElementById('walletBalance').innerText = userBalance.toFixed(4);
     }
 
-    function addBalance(amount) {
+    function addBalance(amount, source = 'ad') {
       userBalance = Math.max(0, userBalance + amount);
       safeSetItem(getStorageKey('app_usdt_balance'), userBalance.toString());
       updateBalanceDisplay();
+      if (source === 'referral') {
+        const msgEl = document.getElementById('refRewardMessage');
+        if (msgEl) {
+          msgEl.style.display = 'block';
+          msgEl.innerText = `🎉 Invitation bonus  +${amount} USDT received. `;
+          setTimeout(() => { msgEl.style.display = 'none'; }, 5000);
+        }
+      }
     }
 
     function deductBalance(amount) {
@@ -435,11 +228,17 @@
     }
 
     function updateDailyCountDisplay() {
-      document.getElementById('dailyCountEarn').innerText = getDailyAdCount('earn');
-      document.getElementById('dailyCountTasks').innerText = getDailyAdCount('tasks');
+      const earnCount = getDailyAdCount('earn');
+      const tasksCount = getDailyAdCount('tasks');
+      document.getElementById('dailyCountEarn').innerText = `${earnCount}/${MAX_DAILY_EARN}`;
+      document.getElementById('dailyCountTasks').innerText = `${tasksCount}/${MAX_DAILY_TASKS}`;
     }
 
-    function canWatchAd(type) { return getDailyAdCount(type) < MAX_DAILY_ADS; }
+    function canWatchAd(type) {
+      const count = getDailyAdCount(type);
+      const max = (type === 'earn') ? MAX_DAILY_EARN : MAX_DAILY_TASKS;
+      return count < max;
+    }
 
     function showStatus(elementId, message, isError = false, timeout = 5000) {
       const el = document.getElementById(elementId);
@@ -461,14 +260,30 @@
       else if (status === 'error') { indicator.classList.add('sdk-error'); if(hint) hint.style.display = 'block'; }
     }
 
-    // ==================== 📦 ADSGRAM SDK ====================
+    async function processReferral(referrerId) {
+      if (referrerId === currentUserId) return;
+      const processedKey = getStorageKey('app_referral_processed');
+      if (safeGetItem(processedKey, '') === referrerId) return;
+      try {
+        const resp = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'processReferral', referrerId, newUserId: currentUserId })
+        });
+        const data = await resp.json();
+        if (data.success) {
+          safeSetItem(processedKey, referrerId);
+          addBalance(data.reward || REFERRAL_REWARD, 'referral');
+        }
+      } catch (e) {}
+    }
+
     function tryInitAdsgramSDK() {
       if (AdsgramSDK_Old && AdsgramSDK_New) return true;
       if (typeof window.Adsgram !== 'undefined' && window.Adsgram.init) {
         try {
           if (!AdsgramSDK_Old) AdsgramSDK_Old = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID_OLD });
           if (!AdsgramSDK_New) AdsgramSDK_New = window.Adsgram.init({ blockId: ADSGRAM_BLOCK_ID_NEW });
-          console.log('✅ Adsgram SDKs initialized');
           updateSdkIndicator('ready');
           setAdsgramButtonPending(false);
           return true;
@@ -481,14 +296,10 @@
       isAdsgramPending = pending;
       const btnOld = document.getElementById('adsgramBtn');
       const btnNew = document.getElementById('adsgramBtnNew');
-      if (btnOld) {
-        btnOld.disabled = pending;
-        btnOld.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO 1";
-      }
-      if (btnNew) {
-        btnNew.disabled = pending;
-        btnNew.innerText = pending ? "⏳ SDK စောင့်ဆိုင်းနေသည်..." : "🚀 WATCH ADSGRAM VIDEO 2";
-      }
+      const txtOld = document.getElementById('adsgramBtnText');
+      const txtNew = document.getElementById('adsgramBtnNewText');
+      if (btnOld && txtOld) { btnOld.disabled = pending; txtOld.innerText = pending ? "⏳ Waiting for SDK..." : "🚀 WATCH ADSGRAM VIDEO 1 — HIGH REWARD BONUS!"; }
+      if (btnNew && txtNew) { btnNew.disabled = pending; txtNew.innerText = pending ? "⏳ Waiting for SDK..." : "🚀 WATCH ADSGRAM VIDEO 2 — CLICK NOW TO WATCH!"; }
     }
 
     function checkAdsgramSDK() {
@@ -503,22 +314,13 @@
     }
 
     function triggerAdsgramVideo(type) {
-      if (isAdsgramPending) { 
-        const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
-        showStatus(statusId, "⏳ SDK စောင့်ဆိုင်းနေဆဲ...", false, 3000); 
-        return; 
-      }
-      if (!canWatchAd('tasks')) { 
-        const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
-        showStatus(statusId, "❌ ယနေ့ကန့်သတ်ချက်ပြည့်သွားပါပြီ။", true); 
-        return; 
-      }
+      if (isAdsgramPending) { showStatus(type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew', "⏳ SDK still waiting...", false, 3000); return; }
+      if (!canWatchAd('tasks')) { showStatus(type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew', "❌ Today's limit has been reached.", true); return; }
 
       if (!AdsgramSDK_Old || !AdsgramSDK_New) {
         if (!tryInitAdsgramSDK()) {
           adsgramRetryCount = 0; updateSdkIndicator('loading'); setAdsgramButtonPending(true);
-          const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
-          showStatus(statusId, "⏳ SDK ပြင်ဆင်နေပါသည်...", false, 4000);
+          showStatus(type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew', "⏳ Preparing SDK...", false, 4000);
           checkAdsgramSDK();
           return;
         }
@@ -526,44 +328,45 @@
 
       const activeSDK = type === 'old' ? AdsgramSDK_Old : AdsgramSDK_New;
       const btnId = type === 'old' ? 'adsgramBtn' : 'adsgramBtnNew';
+      const txtId = type === 'old' ? 'adsgramBtnText' : 'adsgramBtnNewText';
       const statusId = type === 'old' ? 'adsgramStatus' : 'adsgramStatusNew';
-      const defaultText = type === 'old' ? "🚀 WATCH ADSGRAM VIDEO 1" : "🚀 WATCH ADSGRAM VIDEO 2";
+      const defaultText = type === 'old' ? "🚀 WATCH ADSGRAM VIDEO 1 — HIGH REWARD BONUS!" : "🚀 WATCH ADSGRAM VIDEO 2 — CLICK NOW TO WATCH!";
 
       const btn = document.getElementById(btnId);
-      btn.disabled = true; btn.innerText = "⏳ ကြော်ငြာ ခေါ်ယူနေသည်...";
+      const txt = document.getElementById(txtId);
+      btn.disabled = true; txt.innerText = "⏳ Loading ad...";
 
       activeSDK.show().then(result => {
         if (result?.done) {
-          btn.innerText = "⏳ 1 စက္ကန့် စောင့်ပါ...";
+          txt.innerText = "⏳ Please wait 1 second...";
           setTimeout(() => {
             incrementAdCount('tasks'); addBalance(REWARD_PER_AD);
-            btn.disabled = false; btn.innerText = defaultText;
-            showStatus(statusId, `✅ အောင်မြင်သည်။ +${REWARD_PER_AD} USDT`);
+            btn.disabled = false; txt.innerText = defaultText;
+            showStatus(statusId, `✅ Success! +${REWARD_PER_AD} USDT`);
           }, 5000);
         } else {
-          btn.disabled = false; btn.innerText = defaultText;
-          showStatus(statusId, "⚠️ ကြော်ငြာမပြီးပါ။", true);
+          btn.disabled = false; txt.innerText = defaultText;
+          showStatus(statusId, "⚠️ Ad not finished.", true);
         }
       }).catch(() => {
-        btn.disabled = false; btn.innerText = defaultText;
-        showStatus(statusId, "❌ ကြော်ငြာမရှိသေးပါ။", true);
+        btn.disabled = false; txt.innerText = defaultText;
+        showStatus(statusId, "❌ No ads available", true);
       });
     }
 
-    // ==================== 🎥 ADSTERRA ====================
     function openAdsterraLink() {
-      if (!canWatchAd('earn')) { showStatus('adsterraStatus', "❌ ယနေ့ကန့်သတ်ချက်ပြည့်သွားပါပြီ။", true); return; }
+      if (!canWatchAd('earn')) { showStatus('adsterraStatus', "❌ Today's limit has been reached.", true); return; }
       const btn = document.getElementById('adsterraBtn');
-      btn.disabled = true; btn.innerText = "⏳ ဖွင့်နေသည်...";
+      const txt = document.getElementById('adsterraBtnText');
+      btn.disabled = true; txt.innerText = "⏳ Opening...";
       try { window.open(ADSTERRA_DIRECT_LINK, '_blank'); } catch (e) {}
       setTimeout(() => {
         incrementAdCount('earn'); addBalance(REWARD_PER_AD);
-        btn.disabled = false; btn.innerText = "🎬 WATCH EXCLUSIVE VIDEO";
-        showStatus('adsterraStatus', `✅ အောင်မြင်သည်။ +${REWARD_PER_AD} USDT`);
+        btn.disabled = false; txt.innerText = "🎬 WATCH EXCLUSIVE VIDEO — CLICK HERE TO EARN NOW!";
+        showStatus('adsterraStatus', `✅ Success! +${REWARD_PER_AD} USDT`);
       }, 5000);
     }
 
-    // ==================== 💼 WITHDRAW ====================
     function isValidTonAddress(addr) {
       return /^(-1|0):[0-9A-Fa-f]{64}$/.test(addr) || /^[A-Za-z0-9_\-]{48}$/.test(addr);
     }
@@ -574,12 +377,10 @@
       const btn = document.getElementById('withdrawBtn');
       const amount = parseFloat(amountInput.value);
       const address = addressInput.value.trim();
-
-      if (isNaN(amount) || amount < 0.1) { showStatus('withdrawStatus', "❌ အနည်းဆုံး 0.1 USDT", true); return; }
-      if (!isValidTonAddress(address)) { showStatus('withdrawStatus', "❌ TON လိပ်စာမမှန်ပါ", true); return; }
-      if (amount > userBalance) { showStatus('withdrawStatus', "❌ လက်ကျန်မလုံလောက်ပါ", true); return; }
-
-      btn.disabled = true; btn.innerText = "⏳ ပို့နေပါသည်...";
+      if (isNaN(amount) || amount < 0.1) { showStatus('withdrawStatus', "❌ Minimum 0.1 USDT", true); return; }
+      if (!isValidTonAddress(address)) { showStatus('withdrawStatus', "❌ Invalid TON address", true); return; }
+      if (amount > userBalance) { showStatus('withdrawStatus', "❌ Not enough balance", true); return; }
+      btn.disabled = true; btn.innerText = "⏳ Sending request...";
       try {
         const resp = await fetch(GOOGLE_SCRIPT_URL, {
           method: 'POST',
@@ -589,24 +390,23 @@
         const data = await resp.json();
         if (data.success) {
           deductBalance(amount);
-          showStatus('withdrawStatus', "✅ တောင်းဆိုချက်ပို့ပြီးပါပြီ။");
+          showStatus('withdrawStatus', "✅ Request sent successfully.");
           amountInput.value = ''; addressInput.value = '';
         } else throw new Error(data.message);
       } catch (e) {
-        showStatus('withdrawStatus', "❌ တောင်းဆိုမှုမအောင်မြင်ပါ။", true);
+        showStatus('withdrawStatus', "❌ Request failed.", true);
       } finally { btn.disabled = false; btn.innerText = "CONFIRM WITHDRAWAL"; }
     }
 
-    // ==================== 🛡️ ADMIN LOGIC ====================
     async function loadPendingWithdrawals() {
       if (currentUserId !== ADMIN_ID) return;
       const container = document.getElementById('adminContainer');
-      container.innerHTML = '<p style="text-align:center;">⏳ စာရင်းများရယူနေသည်...</p>';
+      container.innerHTML = '<p style="text-align:center;">⏳ Loading list...</p>';
       try {
         const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPendingWithdrawals`);
         const data = await resp.json();
         if (data.success && data.requests.length === 0) {
-          container.innerHTML = '<p style="text-align:center;">✅ စောင့်ဆိုင်းနေသော တောင်းဆိုချက်မရှိပါ။</p>';
+          container.innerHTML = '<p style="text-align:center;">✅ No pending requests found.</p>';
           return;
         }
         container.innerHTML = '';
@@ -634,22 +434,32 @@
                 body: JSON.stringify({ action: 'adminAction', requestId: id, type: action })
               });
               const d = await res.json();
-              if (d.success) { alert(`✅ ${action} အောင်မြင်ပါသည်။`); loadPendingWithdrawals(); }
-              else alert('❌ မအောင်မြင်ပါ');
+              if (d.success) { alert(`✅ ${action} successful.`); loadPendingWithdrawals(); }
+              else alert('❌ Failed');
             } catch (e) { alert('Network error'); }
           });
         });
-      } catch (e) { container.innerHTML = '<p style="color:red;">စာရင်းများရယူ၍မရပါ။</p>'; }
+      } catch (e) { container.innerHTML = '<p style="color:red;">❌ Unable to fetch requests.</p>'; }
     }
 
-    // ==================== 🚀 APP INIT ====================
     function initApp() {
       if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand();
-        const user = window.Telegram.WebApp.initDataUnsafe?.user;
-        if (user) currentUserId = String(user.id);
+        window.Telegram.WebApp.ready(); 
+        window.Telegram.WebApp.expand();
+        const initData = window.Telegram.WebApp.initDataUnsafe;
+        if (initData?.user) {
+          currentUserId = String(initData.user.id);
+          let displayName = initData.user.username ? "@" + initData.user.username : (initData.user.first_name || "User");
+          document.getElementById('topMarqueeText').innerText = `🙋🏻‍♂️ ${displayName} 🎁Grid 📺Zenith_bot🤑 (ID: ${currentUserId})`;
+        }
+        if (initData?.start_param) {
+          const referrerId = initData.start_param;
+          setTimeout(() => { processReferral(referrerId); }, 800);
+        }
       }
+      
       document.getElementById('displayUserId').innerText = currentUserId;
+      
       if (currentUserId === ADMIN_ID) {
         document.getElementById('adminTabButton').style.display = 'flex';
         document.querySelector('[data-tab="admin"]').addEventListener('click', loadPendingWithdrawals);
@@ -661,8 +471,8 @@
       document.getElementById('copyRefBtn').addEventListener('click', async () => {
         try {
           await navigator.clipboard.writeText(document.getElementById('refLink').value);
-          alert('✅ Link ကူးယူပြီးပါပြီ။');
-        } catch (e) { alert('❌ ကူးယူ၍မရပါ'); }
+          alert('✅ Link copied to clipboard');
+        } catch (e) { alert('❌ Copy failed'); }
       });
 
       updateBalanceDisplay();
