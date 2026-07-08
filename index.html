@@ -35,7 +35,7 @@
     .action-group { display: flex; gap: 10px; margin-top: 12px; }
     .btn-approve { flex: 1; padding: 10px; background: #22c55e; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
     .btn-reject { flex: 1; padding: 10px; background: #ef4444; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-    .status-message { margin-top: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: bold; padding: 8px; border-radius: 10px; }
+    .status-message { margin-top: 10px; font-size: 0.8rem; text-align: center; display: none; font-weight: bold; padding: 8px; border-radius: 10px; word-break: break-word; }
     .referral-console { background: #13142b; border: 1px solid #232540; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
     .referral-console h3 { font-size: 1rem; color: #3bccff; margin-bottom: 4px; }
     .referral-link { width: 100%; padding: 12px; background: #090a16; border: 1px solid #232540; border-radius: 10px; color: #fff; font-size: 0.85rem; margin-bottom: 10px; }
@@ -47,6 +47,7 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     .pending-request { margin-bottom: 12px; padding: 10px; background: #0d0e1f; border-radius: 10px; }
     #refRewardMessage { font-size:0.8rem; margin-top:8px; display:none; text-align:center; }
+    .form-group input.input-error { border-color: #ef4444 !important; box-shadow: 0 0 10px rgba(239,68,68,0.4) !important; }
   </style>
 </head>
 <body>
@@ -124,8 +125,8 @@
           <input type="number" id="withdrawAmount" placeholder="0.1" min="0.1" step="0.01">
         </div>
         <div class="form-group">
-          <label>Your TON Receive Address</label>
-          <input type="text" id="tonAddress" placeholder="Enter TON Address...">
+          <label>Your TON Receive Address <span style="color:#aaa; font-size:0.7rem;">(e.g. EQ... or 0:...)</span></label>
+          <input type="text" id="tonAddress" placeholder="Enter TON Address (e.g. EQ...)">
         </div>
         <button class="btn-premium-withdraw" id="withdrawBtn" onclick="requestWithdraw()">CONFIRM WITHDRAWAL</button>
         <p id="withdrawStatus" class="status-message"></p>
@@ -157,6 +158,7 @@
     const REFERRAL_REWARD = 0.01; 
     const MAX_DAILY_EARN = 50;   
     const MAX_DAILY_TASKS = 500; 
+    const FETCH_TIMEOUT = 15000;
 
     let currentUserId = "anonymous";
     let AdsgramSDK_Old = null;
@@ -165,6 +167,7 @@
     let adsgramRetryCount = 0;
     const MAX_ADSGRAM_RETRY = 15;
     let isAdsgramPending = false;
+    let isWithdrawPending = false;
 
     function safeGetItem(key, fallback = null) {
       try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
@@ -247,7 +250,10 @@
       el.style.color = isError ? '#ef4444' : '#22c55e';
       el.style.background = isError ? 'rgba(239,68,68,0.08)' : 'rgba(34,197,94,0.06)';
       el.innerText = message;
-      if (timeout > 0) setTimeout(() => { el.style.display = 'none'; }, timeout);
+      if (timeout > 0) {
+        clearTimeout(el._statusTimeout);
+        el._statusTimeout = setTimeout(() => { el.style.display = 'none'; }, timeout);
+      }
     }
 
     function updateSdkIndicator(status) {
@@ -265,7 +271,7 @@
       const processedKey = getStorageKey('app_referral_processed');
       if (safeGetItem(processedKey, '') === referrerId) return;
       try {
-        const resp = await fetch(GOOGLE_SCRIPT_URL, {
+        const resp = await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ action: 'processReferral', referrerId, newUserId: currentUserId })
@@ -275,7 +281,25 @@
           safeSetItem(processedKey, referrerId);
           addBalance(data.reward || REFERRAL_REWARD, 'referral');
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log('Referral processing error:', e.message);
+      }
+    }
+
+    async function fetchWithTimeout(url, options = {}, timeout = FETCH_TIMEOUT) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+      try {
+        const response = await fetch(url, { ...options, signal: controller.signal });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out. Server not responding.');
+        }
+        throw error;
+      }
     }
 
     function tryInitAdsgramSDK() {
@@ -367,35 +391,120 @@
       }, 5000);
     }
 
+    // ✅ ပြင်ဆင်ထားသော TON Address Validation (EQ/UQ အစစ်အမှန်)
     function isValidTonAddress(addr) {
-      return /^(-1|0):[0-9A-Fa-f]{64}$/.test(addr) || /^[A-Za-z0-9_\-]{48}$/.test(addr);
+      if (!addr || typeof addr !== 'string') return false;
+      const trimmed = addr.trim();
+      
+      // Raw format: -1:64hexchars or 0:64hexchars
+      if (/^(-1|0):[0-9A-Fa-f]{64}$/.test(trimmed)) return true;
+      
+      // User-friendly format (starts with EQ or UQ, total 48 characters)
+      if (/^[EU][Qq][A-Za-z0-9\-_]{46}$/.test(trimmed)) return true;
+      
+      return false;
     }
 
     async function requestWithdraw() {
+      if (isWithdrawPending) {
+        showStatus('withdrawStatus', "⏳ Withdrawal request is being processed...", false, 3000);
+        return;
+      }
+
       const amountInput = document.getElementById('withdrawAmount');
       const addressInput = document.getElementById('tonAddress');
       const btn = document.getElementById('withdrawBtn');
+      
+      amountInput.classList.remove('input-error');
+      addressInput.classList.remove('input-error');
+      
       const amount = parseFloat(amountInput.value);
       const address = addressInput.value.trim();
-      if (isNaN(amount) || amount < 0.1) { showStatus('withdrawStatus', "❌ Minimum 0.1 USDT", true); return; }
-      if (!isValidTonAddress(address)) { showStatus('withdrawStatus', "❌ Invalid TON address", true); return; }
-      if (amount > userBalance) { showStatus('withdrawStatus', "❌ Not enough balance", true); return; }
-      btn.disabled = true; btn.innerText = "⏳ Sending request...";
+      
+      if (isNaN(amount) || amount < 0.1) {
+        showStatus('withdrawStatus', "❌ Minimum withdrawal amount is 0.1 USDT.", true);
+        amountInput.classList.add('input-error');
+        amountInput.focus();
+        return;
+      }
+      
+      if (!address) {
+        showStatus('withdrawStatus', "❌ Please enter your TON address.", true);
+        addressInput.classList.add('input-error');
+        addressInput.focus();
+        return;
+      }
+      
+      if (!isValidTonAddress(address)) {
+        showStatus('withdrawStatus', "❌ Invalid TON address format.\nPlease use address starting with EQ or UQ (e.g., EQ...)", true, 8000);
+        addressInput.classList.add('input-error');
+        addressInput.focus();
+        return;
+      }
+      
+      if (amount > userBalance) {
+        showStatus('withdrawStatus', `❌ Insufficient balance. You have ${userBalance.toFixed(4)} USDT.`, true);
+        amountInput.classList.add('input-error');
+        return;
+      }
+
+      isWithdrawPending = true;
+      btn.disabled = true;
+      btn.innerText = "⏳ Sending request...";
+      showStatus('withdrawStatus', "⏳ Connecting to server...", false, 0);
+      
+      console.log(`[Withdraw] Starting: userId=${currentUserId}, amount=${amount}, address=${address.substring(0,10)}...`);
+      
       try {
-        const resp = await fetch(GOOGLE_SCRIPT_URL, {
+        const resp = await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'requestWithdraw', userId: currentUserId, amount, address })
-        });
+          body: JSON.stringify({ 
+            action: 'requestWithdraw', 
+            userId: currentUserId, 
+            amount, 
+            address,
+            timestamp: Date.now()
+          })
+        }, FETCH_TIMEOUT);
+        
+        console.log('[Withdraw] Response status:', resp.status);
+        
+        const contentType = resp.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+          const text = await resp.text();
+          console.error('[Withdraw] Non-JSON response:', text.substring(0, 200));
+          throw new Error('Server returned invalid response. The backend may not be set up correctly.');
+        }
+        
         const data = await resp.json();
+        console.log('[Withdraw] Response data:', data);
+        
         if (data.success) {
           deductBalance(amount);
-          showStatus('withdrawStatus', "✅ Request sent successfully.");
-          amountInput.value = ''; addressInput.value = '';
-        } else throw new Error(data.message);
+          showStatus('withdrawStatus', "✅ Withdrawal request sent successfully!\nAdmin will review your request.", false, 10000);
+          amountInput.value = ''; 
+          addressInput.value = '';
+        } else {
+          throw new Error(data.message || 'Server rejected the request.');
+        }
       } catch (e) {
-        showStatus('withdrawStatus', "❌ Request failed.", true);
-      } finally { btn.disabled = false; btn.innerText = "CONFIRM WITHDRAWAL"; }
+        console.error('[Withdraw] Error:', e.message);
+        
+        let errorMsg = e.message;
+        if (errorMsg.includes('timed out') || errorMsg.includes('AbortError')) {
+          errorMsg = '⏱️ Server not responding. Possible causes:\n- Backend script is not deployed\n- Network issue\n- Server is down';
+        } else if (errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+          errorMsg = '🌐 Network error. Please check:\n- Your internet connection\n- The backend URL is correct\n- CORS settings on Google Script';
+        }
+        
+        showStatus('withdrawStatus', `❌ ${errorMsg}`, true, 12000);
+      } finally {
+        isWithdrawPending = false;
+        btn.disabled = false;
+        btn.innerText = "CONFIRM WITHDRAWAL";
+        console.log('[Withdraw] Process completed.');
+      }
     }
 
     async function loadPendingWithdrawals() {
@@ -403,7 +512,7 @@
       const container = document.getElementById('adminContainer');
       container.innerHTML = '<p style="text-align:center;">⏳ Loading list...</p>';
       try {
-        const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=getPendingWithdrawals`);
+        const resp = await fetchWithTimeout(`${GOOGLE_SCRIPT_URL}?action=getPendingWithdrawals`, { method: 'GET' });
         const data = await resp.json();
         if (data.success && data.requests.length === 0) {
           container.innerHTML = '<p style="text-align:center;">✅ No pending requests found.</p>';
@@ -428,7 +537,7 @@
             const id = this.dataset.id;
             const action = this.classList.contains('btn-approve') ? 'approve' : 'reject';
             try {
-              const res = await fetch(GOOGLE_SCRIPT_URL, {
+              const res = await fetchWithTimeout(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ action: 'adminAction', requestId: id, type: action })
@@ -436,10 +545,12 @@
               const d = await res.json();
               if (d.success) { alert(`✅ ${action} successful.`); loadPendingWithdrawals(); }
               else alert('❌ Failed');
-            } catch (e) { alert('Network error'); }
+            } catch (e) { alert('Network error: ' + e.message); }
           });
         });
-      } catch (e) { container.innerHTML = '<p style="color:red;">❌ Unable to fetch requests.</p>'; }
+      } catch (e) { 
+        container.innerHTML = `<p style="color:red;">❌ Unable to fetch requests: ${e.message}</p>`; 
+      }
     }
 
     function initApp() {
@@ -457,9 +568,9 @@
           setTimeout(() => { processReferral(referrerId); }, 800);
         }
       }
-      
+
       document.getElementById('displayUserId').innerText = currentUserId;
-      
+
       if (currentUserId === ADMIN_ID) {
         document.getElementById('adminTabButton').style.display = 'flex';
         document.querySelector('[data-tab="admin"]').addEventListener('click', loadPendingWithdrawals);
@@ -482,6 +593,8 @@
 
       updateSdkIndicator('loading');
       if (!tryInitAdsgramSDK()) { adsgramRetryCount = 0; checkAdsgramSDK(); }
+      
+      console.log('[App] Initialized. userId:', currentUserId, 'balance:', userBalance);
     }
 
     function setupTabNavigation() {
